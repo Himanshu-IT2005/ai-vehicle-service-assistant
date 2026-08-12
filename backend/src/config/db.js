@@ -14,6 +14,11 @@ const dbConfig = {
 
 const pool = mysql.createPool(dbConfig);
 
+// Prevent uncaught database pool crashes
+pool.on('error', (err) => {
+    console.error('Unexpected MySQL database pool error:', err);
+});
+
 const testConnection = async () => {
     try {
         const connection = await pool.getConnection();
