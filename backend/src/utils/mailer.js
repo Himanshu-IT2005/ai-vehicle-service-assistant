@@ -109,6 +109,8 @@ const transporter = {
             return sendEmailViaResend(mailOptions);
         }
 
+        console.warn(`[SMTP Mailer Warning] RESEND_API_KEY env variable is not set. Falling back to direct SMTP connections (which are blocked/restricted by default on Railway's hosting network).`);
+
         try {
             console.log(`[SMTP Mailer] Attempting connection via port ${primaryPort}...`);
             const tx = await createMailTransporter(primaryPort);
