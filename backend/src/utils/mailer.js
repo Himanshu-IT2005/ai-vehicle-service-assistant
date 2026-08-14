@@ -1,5 +1,6 @@
 const nodemailer = require('nodemailer');
 const dns = require('dns');
+const axios = require('axios');
 require('dotenv').config();
 
 const primaryPort = parseInt(process.env.SMTP_PORT || '587');
@@ -44,8 +45,37 @@ const createMailTransporter = async (port) => {
     });
 };
 
+// Dispatch email via Resend's secure HTTPS REST API (forces port 443, which is never blocked by cloud firewalls)
+const sendEmailViaResend = async (mailOptions) => {
+    try {
+        console.log(`[Resend Mailer] Dispatching email via HTTPS API to ${mailOptions.to}...`);
+        const response = await axios.post('https://api.resend.com/emails', {
+            from: mailOptions.from || process.env.SMTP_FROM || `"DriveSync AI" <onboarding@resend.dev>`,
+            to: mailOptions.to,
+            subject: mailOptions.subject,
+            html: mailOptions.html
+        }, {
+            headers: {
+                'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        console.log(`[Resend Mailer] Email sent successfully. ID: ${response.data.id}`);
+        return { messageId: response.data.id };
+    } catch (err) {
+        const errMsg = err.response && err.response.data ? JSON.stringify(err.response.data) : err.message;
+        console.error(`[Resend Mailer Error] API dispatch failed: ${errMsg}`);
+        throw new Error(`Resend HTTPS SMTP bypass failed: ${errMsg}`);
+    }
+};
+
 const transporter = {
     sendMail: async (mailOptions) => {
+        // If Resend API key is configured, bypass SMTP blockages completely by sending over HTTPS port 443
+        if (process.env.RESEND_API_KEY) {
+            return sendEmailViaResend(mailOptions);
+        }
+
         try {
             console.log(`[SMTP Mailer] Attempting connection via port ${primaryPort}...`);
             const tx = await createMailTransporter(primaryPort);
@@ -67,11 +97,11 @@ const transporter = {
 
 const sendWelcomeEmail = async (toEmail, userName) => {
     try {
-        // Safe check: if SMTP configurations are the default placeholder or not set, fallback to console logger
-        const isPlaceholder = !process.env.SMTP_USER ||
+        // Safe check: if SMTP configurations and Resend credentials are not set, fallback to console logger
+        const isPlaceholder = (!process.env.SMTP_USER ||
             process.env.SMTP_USER === 'your_email@gmail.com' ||
             !process.env.SMTP_PASS ||
-            process.env.SMTP_PASS === 'your_app_password';
+            process.env.SMTP_PASS === 'your_app_password') && !process.env.RESEND_API_KEY;
 
         if (isPlaceholder) {
             console.log('\n=======================================================');
@@ -166,10 +196,10 @@ const sendWelcomeEmail = async (toEmail, userName) => {
 
 const sendResetPasswordEmail = async (toEmail, userName, tempPassword) => {
     try {
-        const isPlaceholder = !process.env.SMTP_USER ||
+        const isPlaceholder = (!process.env.SMTP_USER ||
             process.env.SMTP_USER === 'your_email@gmail.com' ||
             !process.env.SMTP_PASS ||
-            process.env.SMTP_PASS === 'your_app_password';
+            process.env.SMTP_PASS === 'your_app_password') && !process.env.RESEND_API_KEY;
 
         if (isPlaceholder) {
             console.log('\n=======================================================');
@@ -243,10 +273,10 @@ const sendResetPasswordEmail = async (toEmail, userName, tempPassword) => {
 
 const sendAccountDeletedEmail = async (toEmail, userName) => {
     try {
-        const isPlaceholder = !process.env.SMTP_USER ||
+        const isPlaceholder = (!process.env.SMTP_USER ||
             process.env.SMTP_USER === 'your_email@gmail.com' ||
             !process.env.SMTP_PASS ||
-            process.env.SMTP_PASS === 'your_app_password';
+            process.env.SMTP_PASS === 'your_app_password') && !process.env.RESEND_API_KEY;
 
         if (isPlaceholder) {
             console.log('\n=======================================================');
