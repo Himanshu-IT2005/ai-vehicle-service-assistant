@@ -50,8 +50,17 @@ const sendEmailViaResend = (mailOptions) => {
     return new Promise((resolve, reject) => {
         console.log(`[Resend Mailer] Dispatching email via HTTPS API to ${mailOptions.to}...`);
 
+        // Resend free-tier sandbox only allows sending from onboarding@resend.dev unless a custom domain is verified.
+        // We override the 'from' configuration to prevent 403 restriction failures during sandbox testing.
+        let fromAddress = mailOptions.from || process.env.SMTP_FROM || '"DriveSync AI" <onboarding@resend.dev>';
+        const isVerifiedBypass = process.env.RESEND_CUSTOM_DOMAIN_VERIFIED === 'true';
+        if (!isVerifiedBypass && (fromAddress.includes('@gmail.com') || fromAddress.includes('@yahoo.com') || fromAddress.includes('@outlook.com') || !fromAddress.includes('resend.dev'))) {
+            console.log(`[Resend Mailer] Unverified sender detected (${fromAddress}). Forcing 'onboarding@resend.dev' default sender to bypass Resend restriction.`);
+            fromAddress = '"DriveSync AI" <onboarding@resend.dev>';
+        }
+
         const postData = JSON.stringify({
-            from: mailOptions.from || process.env.SMTP_FROM || '"DriveSync AI" <onboarding@resend.dev>',
+            from: fromAddress,
             to: mailOptions.to,
             subject: mailOptions.subject,
             html: mailOptions.html
