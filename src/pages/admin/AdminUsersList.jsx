@@ -121,17 +121,19 @@ export default function AdminUsersList() {
                                         </td>
                                         <td className="py-4 px-6 whitespace-nowrap">
                                             <span className={`px-2 py-0.5 rounded text-[9px] font-bold border ${u.role === 'admin'
-                                                    ? 'bg-rose-955/60 text-rose-400 border-rose-900/30'
-                                                    : 'bg-blue-950/60 text-blue-400 border-blue-900/30'
+                                                ? 'bg-rose-955/60 text-rose-400 border-rose-900/30'
+                                                : 'bg-blue-950/60 text-blue-400 border-blue-900/30'
                                                 }`}>
                                                 {u.role.toUpperCase()}
                                             </span>
                                         </td>
-                                        <td className="py-4 px-6 whitespace-nowrap">{u.createdAt}</td>
+                                        <td className="py-4 px-6 whitespace-nowrap">
+                                            {u.created_at ? new Date(u.created_at).toLocaleDateString() : 'N/A'}
+                                        </td>
                                         <td className="py-4 px-6 whitespace-nowrap">
                                             <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-bold ${u.status === 'active'
-                                                    ? 'bg-green-950 text-green-400'
-                                                    : 'bg-red-955 text-red-400'
+                                                ? 'bg-green-950 text-green-400'
+                                                : 'bg-red-955 text-red-400'
                                                 }`}>
                                                 {u.status.toUpperCase()}
                                             </span>
@@ -147,8 +149,8 @@ export default function AdminUsersList() {
                                             <button
                                                 onClick={() => handleToggleSuspend(u.id, u.status)}
                                                 className={`px-2.5 py-1.5 border rounded font-semibold transition-all inline-flex items-center ${u.status === 'suspended'
-                                                        ? 'bg-green-955/40 border-green-900/30 text-green-400 hover:bg-green-950/60'
-                                                        : 'bg-red-955/40 border-red-900/30 text-red-400 hover:bg-red-950/60'
+                                                    ? 'bg-green-955/40 border-green-900/30 text-green-400 hover:bg-green-950/60'
+                                                    : 'bg-red-955/40 border-red-900/30 text-red-400 hover:bg-red-950/60'
                                                     }`}
                                             >
                                                 <Ban className="w-3.5 h-3.5 mr-1" /> {u.status === 'suspended' ? "ACTIVATE" : "SUSPEND"}

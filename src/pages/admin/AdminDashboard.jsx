@@ -118,7 +118,9 @@ export default function AdminDashboard() {
                                 </div>
 
                                 <div className="text-right">
-                                    <span className="text-[10px] text-slate-500 block">Joined {u.createdAt}</span>
+                                    <span className="text-[10px] text-slate-500 block">
+                                        Joined {u.created_at ? new Date(u.created_at).toLocaleDateString() : 'N/A'}
+                                    </span>
                                 </div>
                             </div>
                         ))}
@@ -142,8 +144,8 @@ export default function AdminDashboard() {
                                 <div className="flex justify-between items-center">
                                     <span className="text-[10.5px] font-bold text-slate-205">{ai.responseCategory}</span>
                                     <span className={`px-1.5 py-0.5 rounded text-[8px] font-semibold border ${ai.responseSeverity === 'High'
-                                            ? 'bg-red-955/60 text-red-400 border-red-900/30'
-                                            : 'bg-amber-955/60 text-amber-400 border-amber-900/25'
+                                        ? 'bg-red-955/60 text-red-400 border-red-900/30'
+                                        : 'bg-amber-955/60 text-amber-400 border-amber-900/25'
                                         }`}>
                                         {ai.responseSeverity}
                                     </span>
