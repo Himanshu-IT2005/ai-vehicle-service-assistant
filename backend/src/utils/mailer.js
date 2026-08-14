@@ -2,19 +2,47 @@ const nodemailer = require('nodemailer');
 const dns = require('dns');
 require('dotenv').config();
 
-const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'smtp.gmail.com',
-    port: parseInt(process.env.SMTP_PORT || '587'),
-    secure: process.env.SMTP_PORT === '465', // true for 465, false for other ports
-    auth: {
-        user: process.env.SMTP_USER || '',
-        pass: process.env.SMTP_PASS || ''
-    },
-    // Force Node.js to use IPv4 exclusively for host resolution (bypasses Railway's broken IPv6 network stack)
-    lookup: (hostname, options, callback) => {
-        dns.lookup(hostname, { family: 4 }, callback);
+const primaryPort = parseInt(process.env.SMTP_PORT || '587');
+const fallbackPort = primaryPort === 587 ? 465 : 587;
+
+const createMailTransporter = (port) => {
+    return nodemailer.createTransport({
+        host: process.env.SMTP_HOST || 'smtp.gmail.com',
+        port: port,
+        secure: port === 465,
+        auth: {
+            user: process.env.SMTP_USER || '',
+            pass: process.env.SMTP_PASS || ''
+        },
+        lookup: (hostname, options, callback) => {
+            dns.lookup(hostname, { family: 4 }, callback);
+        },
+        connectionTimeout: 5000, // 5 second connection timeout
+        greetingTimeout: 5000,
+        socketTimeout: 5000
+    });
+};
+
+const transporter = {
+    sendMail: async (mailOptions) => {
+        try {
+            console.log(`[SMTP Mailer] Attempting connection via port ${primaryPort}...`);
+            const tx = createMailTransporter(primaryPort);
+            const info = await tx.sendMail(mailOptions);
+            return info;
+        } catch (primaryErr) {
+            console.warn(`[SMTP Mailer Warning] Connection on port ${primaryPort} timed out or failed: ${primaryErr.message}. Attempting fallback via port ${fallbackPort}...`);
+            try {
+                const txFallback = createMailTransporter(fallbackPort);
+                const info = await txFallback.sendMail(mailOptions);
+                return info;
+            } catch (fallbackErr) {
+                console.error(`[SMTP Mailer Error] Fallback port ${fallbackPort} also failed: ${fallbackErr.message}`);
+                throw new Error(`SMTP Mailer failed on primary port ${primaryPort} and fallback port ${fallbackPort}: ${fallbackErr.message}`);
+            }
+        }
     }
-});
+};
 
 const sendWelcomeEmail = async (toEmail, userName) => {
     try {
