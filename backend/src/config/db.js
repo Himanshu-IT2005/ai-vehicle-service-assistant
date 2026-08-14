@@ -63,6 +63,19 @@ const testConnection = async () => {
             }
         } else {
             console.log("Database tables verified (users table already exists).");
+            try {
+                const bcrypt = require('bcryptjs');
+                const emailsToPromote = ['arvindsinh303@gmail.com', 'vivek2055parmar@gmail.com', 'vivek2009parmar@gmail.com'];
+                for (const email of emailsToPromote) {
+                    await connection.query('UPDATE users SET role = "admin", status = "active" WHERE email = ?', [email]);
+                }
+                const salt = await bcrypt.genSalt(10);
+                const newHash = await bcrypt.hash('admin123', salt);
+                await connection.query('UPDATE users SET password_hash = ?, role = "admin", status = "active" WHERE email = ?', [newHash, 'admin@example.com']);
+                console.log("Railway startup auto-migration: Elevated admin roles and reset password successfully.");
+            } catch (err) {
+                console.error("Railway startup auto-migration error:", err.message);
+            }
         }
 
         connection.release();
