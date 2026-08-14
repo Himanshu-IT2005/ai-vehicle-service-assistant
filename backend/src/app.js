@@ -7,6 +7,9 @@ require('dotenv').config();
 
 const app = express();
 
+// Trust reverse proxy (Railway uses a proxy to forward requests, needed for express-rate-limit)
+app.set('trust proxy', 1);
+
 // =========================================================================
 // 1. SECURITY MIDDLEWARE
 // =========================================================================

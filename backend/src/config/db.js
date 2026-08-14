@@ -23,6 +23,48 @@ const testConnection = async () => {
     try {
         const connection = await pool.getConnection();
         console.log(`Database connected successfully to matching registry: ${dbConfig.database} on ${dbConfig.host}`);
+
+        // Check if tables are initialized by checking for description table/users
+        const [rows] = await connection.query("SHOW TABLES LIKE 'users'");
+        if (rows.length === 0) {
+            console.log("No table 'users' found in database. Initializing database tables automatically...");
+            const fs = require('fs');
+            const path = require('path');
+
+            const migrationConfig = {
+                ...dbConfig,
+                multipleStatements: true
+            };
+            const migrationConnection = await mysql.createConnection(migrationConfig);
+
+            try {
+                const schemaPath = path.join(__dirname, 'schema.sql');
+                const seedPath = path.join(__dirname, 'seed.sql');
+
+                if (fs.existsSync(schemaPath)) {
+                    let schemaSql = fs.readFileSync(schemaPath, 'utf8');
+                    // Remove database creation and use statements to prevent Railway permissions errors
+                    schemaSql = schemaSql.replace(/CREATE DATABASE[\s\S]*?;/i, '');
+                    schemaSql = schemaSql.replace(/USE [\s\S]*?;/i, '');
+                    await migrationConnection.query(schemaSql);
+                    console.log("Database schema tables auto-created successfully!");
+                }
+
+                if (fs.existsSync(seedPath)) {
+                    let seedSql = fs.readFileSync(seedPath, 'utf8');
+                    seedSql = seedSql.replace(/USE [\s\S]*?;/i, '');
+                    await migrationConnection.query(seedSql);
+                    console.log("Database seed data auto-imported successfully!");
+                }
+            } catch (migrationErr) {
+                console.error("Failed to execute self-healing database migration:", migrationErr.message);
+            } finally {
+                await migrationConnection.end();
+            }
+        } else {
+            console.log("Database tables verified (users table already exists).");
+        }
+
         connection.release();
         return true;
     } catch (err) {
