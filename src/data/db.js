@@ -170,6 +170,18 @@ export const db = {
         }
     },
 
+    deleteUserProfile: async () => {
+        try {
+            const res = await apiClient.delete('/users/profile');
+            if (res.data && res.data.success) {
+                return true;
+            }
+            throw new Error(res.data.message || "Failed to delete user profile");
+        } catch (err) {
+            throw new Error(err.response?.data?.message || err.message || "Failed to delete user profile");
+        }
+    },
+
     // Vehicles
     getVehicles: async () => {
         try {

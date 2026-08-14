@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
 const { pool } = require('../config/db');
+const { sendAccountDeletedEmail } = require('../utils/mailer');
 
 // @desc    Get user profile
 // @route   GET /api/users/profile
@@ -108,8 +109,45 @@ const changePassword = async (req, res, next) => {
     }
 };
 
+// @desc    Delete user profile (cascade deletes all related garage data)
+// @route   DELETE /api/users/profile
+// @access  Private
+const deleteUserProfile = async (req, res, next) => {
+    try {
+        // Fetch details first for emailing
+        const [rows] = await pool.query('SELECT name, email FROM users WHERE id = ?', [req.user.id]);
+
+        if (rows.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "User account not found.",
+                error: null
+            });
+        }
+
+        const { name, email } = rows[0];
+
+        // Execute cascading database delete
+        await pool.query('DELETE FROM users WHERE id = ?', [req.user.id]);
+
+        // Send confirmation email in background
+        sendAccountDeletedEmail(email, name).catch(err => {
+            console.error('[SMTP Mailer Error] Failed to send account deletion proof:', err.message);
+        });
+
+        res.status(200).json({
+            success: true,
+            message: "Your profile and associated vehicles account have been deleted permanently.",
+            data: {}
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+
 module.exports = {
     getUserProfile,
     updateUserProfile,
-    changePassword
+    changePassword,
+    deleteUserProfile
 };

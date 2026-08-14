@@ -91,8 +91,20 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const deleteAccount = async () => {
+        setLoading(true);
+        try {
+            await db.deleteUserProfile();
+            setUser(null);
+        } catch (err) {
+            throw err;
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
-        <AuthContext.Provider value={{ user, loading, login, register, logout, updateProfile, changePassword }}>
+        <AuthContext.Provider value={{ user, loading, login, register, logout, updateProfile, changePassword, deleteAccount }}>
             {children}
         </AuthContext.Provider>
     );

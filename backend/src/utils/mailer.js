@@ -187,7 +187,74 @@ const sendResetPasswordEmail = async (toEmail, userName, tempPassword) => {
     }
 };
 
+const sendAccountDeletedEmail = async (toEmail, userName) => {
+    try {
+        const isPlaceholder = !process.env.SMTP_USER ||
+            process.env.SMTP_USER === 'your_email@gmail.com' ||
+            !process.env.SMTP_PASS ||
+            process.env.SMTP_PASS === 'your_app_password';
+
+        if (isPlaceholder) {
+            console.log('\n=======================================================');
+            console.log('[DEVELOPER MAIL LOG] SMTP is not configured. Logging Account Deletion Email:');
+            console.log(`To: ${toEmail}`);
+            console.log(`Subject: DriveSync AI Account Permanently Deleted`);
+            console.log(`Body: Hi ${userName}, your account and all associated vehicle logs have been permanently deleted as requested.`);
+            console.log('=======================================================\n');
+            return true;
+        }
+
+        const mailOptions = {
+            from: process.env.SMTP_FROM || `"DriveSync AI" <${process.env.SMTP_USER}>`,
+            to: toEmail,
+            subject: 'Account Permanently Deleted - DriveSync AI 🚗',
+            html: `
+                <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 30px; border: 1px solid #e2e8f0; border-radius: 16px; background-color: #ffffff; color: #1e293b;">
+                    <!-- Header -->
+                    <div style="background: linear-gradient(135deg, #ef4444 0%, #991b1b 100%); padding: 30px; border-radius: 12px; text-align: center; margin-bottom: 25px;">
+                        <span style="font-size: 26px; font-weight: 800; color: #ffffff; letter-spacing: 2px; text-transform: uppercase;">
+                            DriveSync AI
+                        </span>
+                        <h1 style="margin: 10px 0 0 0; font-size: 18px; font-weight: 600; color: #fecaca;">
+                            Account Permanently Deleted ⚠️
+                        </h1>
+                    </div>
+                    
+                    <!-- Content -->
+                    <div style="padding: 10px 15px; text-align: left;">
+                        <h2 style="color: #ef4444; font-size: 20px; font-weight: 700; margin-top: 0; margin-bottom: 12px;">
+                            Goodbye, ${userName}!
+                        </h2>
+                        <p style="font-size: 15px; line-height: 1.6; color: #475569; margin-bottom: 20px;">
+                            This email confirms that your DriveSync AI account associated with <strong>${toEmail}</strong> has been permanently deleted as requested.
+                        </p>
+                        <p style="font-size: 15px; line-height: 1.6; color: #475569; margin-bottom: 20px;">
+                            All of your garage registered vehicles, AI logs transcripts, upcoming reminders schedule, and invoice histories have been completely removed from our databases.
+                        </p>
+                        <p style="font-size: 14px; line-height: 1.6; color: #64748b; margin-bottom: 30px;">
+                            Thank you for using DriveSync AI to manage your vehicles. If this account deletion was made in error or if you wish to join us again, you can register a new profile at any time.
+                        </p>
+                    </div>
+                    
+                    <!-- footer -->
+                    <div style="margin-top: 25px; padding-top: 15px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 11px; color: #94a3b8;">
+                        © 2026 DriveSync AI Platform. Data Privacy & Deletion Complete.
+                    </div>
+                </div>
+            `
+        };
+
+        const info = await transporter.sendMail(mailOptions);
+        console.log(`[SMTP Mailer] Account deletion confirmation sent to ${toEmail}. MessageId: ${info.messageId}`);
+        return true;
+    } catch (error) {
+        console.error('[SMTP Mailer Error] Failed to send account deletion email:', error.message);
+        return false;
+    }
+};
+
 module.exports = {
     sendWelcomeEmail,
-    sendResetPasswordEmail
+    sendResetPasswordEmail,
+    sendAccountDeletedEmail
 };

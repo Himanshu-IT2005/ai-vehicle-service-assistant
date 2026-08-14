@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { User, Mail, Phone, Lock, Save, ShieldAlert, CheckCircle } from 'lucide-react';
 
 export default function Profile() {
-    const { user, logout, updateProfile, changePassword } = useAuth();
+    const { user, logout, updateProfile, changePassword, deleteAccount } = useAuth();
 
     const [name, setName] = useState(user?.name || '');
     const [phone, setPhone] = useState(user?.phone || '');
@@ -16,6 +16,9 @@ export default function Profile() {
     const [pwdError, setPwdError] = useState('');
     const [pwdSuccess, setPwdSuccess] = useState(false);
     const [pwdLoading, setPwdLoading] = useState(false);
+
+    const [deleteLoading, setDeleteLoading] = useState(false);
+    const [deleteError, setDeleteError] = useState('');
 
     const handleUpdateProfile = async (e) => {
         e.preventDefault();
@@ -57,9 +60,16 @@ export default function Profile() {
         }
     };
 
-    const handleDeleteAccount = () => {
+    const handleDeleteAccount = async () => {
         if (confirm("WARNING: Are you sure you want to permanently delete your vehicle assistance account? This action is irreversible.")) {
-            logout();
+            setDeleteError('');
+            setDeleteLoading(true);
+            try {
+                await deleteAccount();
+            } catch (err) {
+                setDeleteError(err.message || 'Failed to permanently delete your account.');
+                setDeleteLoading(false);
+            }
         }
     };
 
@@ -209,15 +219,22 @@ export default function Profile() {
                     <div className="bg-red-50/30 border border-red-100 p-6 rounded-2xl space-y-4 shadow-sm">
                         <h3 className="font-semibold text-sm text-red-600 border-b border-red-100/60 pb-2.5">Danger Territory</h3>
 
+                        {deleteError && (
+                            <div className="bg-red-50 border border-red-200 p-2.5 rounded-lg text-red-700 text-xs">
+                                {deleteError}
+                            </div>
+                        )}
+
                         <p className="text-xs text-slate-500 leading-relaxed font-normal">
                             Deleting your account destroys all garage registered vehicles, AI logs transcripts, reminders schedule, and invoices data. This action is not reversible.
                         </p>
 
                         <button
                             onClick={handleDeleteAccount}
-                            className="w-full flex items-center justify-center py-2 px-4 bg-red-50 hover:bg-red-100 border border-red-200 text-red-650 rounded-xl text-xs font-semibold tracking-wider transition-colors"
+                            disabled={deleteLoading}
+                            className="w-full flex items-center justify-center py-2 px-4 bg-red-50 hover:bg-red-100 border border-red-200 text-red-650 rounded-xl text-xs font-semibold tracking-wider transition-colors disabled:opacity-50"
                         >
-                            <ShieldAlert className="w-4.5 h-4.5 mr-1.5" /> DELETE ACCOUNT PERMANENTLY
+                            <ShieldAlert className="w-4.5 h-4.5 mr-1.5" /> {deleteLoading ? "DELETING ACCOUNT..." : "DELETE ACCOUNT PERMANENTLY"}
                         </button>
                     </div>
                 </div>
