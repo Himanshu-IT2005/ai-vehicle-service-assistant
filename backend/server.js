@@ -1,6 +1,12 @@
 const app = require('./src/app');
 const { testConnection } = require('./src/config/db');
 require('dotenv').config();
+const dns = require('dns');
+
+// Force Node.js to prioritize IPv4 resolution (fixes SMTP connection timeouts on Railway IPv6)
+if (typeof dns.setDefaultResultOrder === 'function') {
+    dns.setDefaultResultOrder('ipv4first');
+}
 
 const PORT = process.env.PORT || 5000;
 
