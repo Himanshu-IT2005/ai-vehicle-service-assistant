@@ -5,17 +5,38 @@ require('dotenv').config();
 const primaryPort = parseInt(process.env.SMTP_PORT || '587');
 const fallbackPort = primaryPort === 587 ? 465 : 587;
 
-const createMailTransporter = (port) => {
+// Dynamically resolve SMTP host to an IPv4 address to force IPv4 connection (avoids Railway's broken IPv6 network stack)
+const resolveSMTPHostToIPv4 = async (hostname) => {
+    try {
+        const addresses = await dns.promises.resolve4(hostname);
+        if (addresses && addresses.length > 0) {
+            return addresses[0];
+        }
+    } catch (err) {
+        console.warn(`[SMTP Mailer Warning] DNS resolve4 failed for ${hostname}: ${err.message}. Falling back to default hostname.`);
+    }
+    return hostname;
+};
+
+const createMailTransporter = async (port) => {
+    const rawHost = process.env.SMTP_HOST || 'smtp.gmail.com';
+    let host = rawHost;
+
+    if (rawHost === 'smtp.gmail.com') {
+        host = await resolveSMTPHostToIPv4(rawHost);
+        console.log(`[SMTP Mailer] Custom routing: resolved ${rawHost} to IPv4: ${host}`);
+    }
+
     return nodemailer.createTransport({
-        host: process.env.SMTP_HOST || 'smtp.gmail.com',
+        host: host,
         port: port,
         secure: port === 465,
         auth: {
             user: process.env.SMTP_USER || '',
             pass: process.env.SMTP_PASS || ''
         },
-        lookup: (hostname, options, callback) => {
-            dns.lookup(hostname, { family: 4 }, callback);
+        tls: {
+            servername: rawHost // Crucial: sets SNI to match the TLS certificate of smtp.gmail.com
         },
         connectionTimeout: 5000, // 5 second connection timeout
         greetingTimeout: 5000,
@@ -27,13 +48,13 @@ const transporter = {
     sendMail: async (mailOptions) => {
         try {
             console.log(`[SMTP Mailer] Attempting connection via port ${primaryPort}...`);
-            const tx = createMailTransporter(primaryPort);
+            const tx = await createMailTransporter(primaryPort);
             const info = await tx.sendMail(mailOptions);
             return info;
         } catch (primaryErr) {
             console.warn(`[SMTP Mailer Warning] Connection on port ${primaryPort} timed out or failed: ${primaryErr.message}. Attempting fallback via port ${fallbackPort}...`);
             try {
-                const txFallback = createMailTransporter(fallbackPort);
+                const txFallback = await createMailTransporter(fallbackPort);
                 const info = await txFallback.sendMail(mailOptions);
                 return info;
             } catch (fallbackErr) {
