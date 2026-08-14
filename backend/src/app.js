@@ -16,7 +16,7 @@ app.set('trust proxy', 1);
 // Helmet headers protection
 app.use(helmet());
 
-// CORS configuration (allow requests from development localhost ports dynamically)
+// CORS configuration (allow requests from development localhost ports and Vercel subdomains dynamically)
 const corsOptions = {
     origin: (origin, callback) => {
         if (!origin) return callback(null, true);
@@ -24,7 +24,11 @@ const corsOptions = {
             return callback(null, true);
         }
         const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
-        if (origin === clientUrl) {
+        if (
+            origin === clientUrl ||
+            origin === 'https://ai-vehicle-service-assistant.vercel.app' ||
+            (origin.startsWith('https://ai-vehicle-service-assistant') && origin.endsWith('.vercel.app'))
+        ) {
             return callback(null, true);
         }
         callback(new Error('Not allowed by CORS'));

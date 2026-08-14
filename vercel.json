@@ -1,16 +1,9 @@
 {
-    "services": {
-        "frontend": {
-            "root": ".",
-            "framework": "vite"
-        }
-    },
+    "cleanUrls": true,
     "rewrites": [
         {
-            "source": "/(.*)",
-            "destination": {
-                "service": "frontend"
-            }
+            "source": "/((?!assets/|favicon.ico|vite.svg).*)",
+            "destination": "/index.html"
         }
     ]
 }
