@@ -19,6 +19,7 @@ const protect = (req, res, next) => {
 
             return next();
         } catch (error) {
+            console.error("JWT verification failure details:", error.message || error);
             return res.status(401).json({
                 success: false,
                 message: "Not authorized, token verification failed.",
@@ -28,6 +29,7 @@ const protect = (req, res, next) => {
     }
 
     if (!token) {
+        console.warn("JWT verification failure details: No token provided in authorization headers.");
         return res.status(401).json({
             success: false,
             message: "Not authorized, no token provided.",
