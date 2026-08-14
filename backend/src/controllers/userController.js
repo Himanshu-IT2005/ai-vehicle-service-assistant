@@ -127,8 +127,35 @@ const deleteUserProfile = async (req, res, next) => {
 
         const { name, email } = rows[0];
 
-        // Execute cascading database delete
-        await pool.query('DELETE FROM users WHERE id = ?', [req.user.id]);
+        // Execute cascading database delete manually within transaction (for database environments lacking ON DELETE CASCADE)
+        const connection = await pool.getConnection();
+        try {
+            await connection.beginTransaction();
+
+            // Delete notifications
+            await connection.query('DELETE FROM notifications WHERE user_id = ?', [req.user.id]);
+
+            // Delete AI analyses
+            await connection.query('DELETE FROM ai_analyses WHERE user_id = ?', [req.user.id]);
+
+            // Delete dependencies referencing vehicles of the user
+            await connection.query('DELETE FROM expenses WHERE vehicle_id IN (SELECT id FROM vehicles WHERE user_id = ?)', [req.user.id]);
+            await connection.query('DELETE FROM maintenance_reminders WHERE vehicle_id IN (SELECT id FROM vehicles WHERE user_id = ?)', [req.user.id]);
+            await connection.query('DELETE FROM service_records WHERE vehicle_id IN (SELECT id FROM vehicles WHERE user_id = ?)', [req.user.id]);
+
+            // Delete vehicles
+            await connection.query('DELETE FROM vehicles WHERE user_id = ?', [req.user.id]);
+
+            // Finally delete the user
+            await connection.query('DELETE FROM users WHERE id = ?', [req.user.id]);
+
+            await connection.commit();
+        } catch (txErr) {
+            await connection.rollback();
+            throw txErr;
+        } finally {
+            connection.release();
+        }
 
         // Send confirmation email in background
         sendAccountDeletedEmail(email, name).catch(err => {

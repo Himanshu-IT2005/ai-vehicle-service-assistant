@@ -96,6 +96,8 @@ export const AuthProvider = ({ children }) => {
         try {
             await db.deleteUserProfile();
             setUser(null);
+            localStorage.removeItem('v_token');
+            localStorage.removeItem('v_current_user');
         } catch (err) {
             throw err;
         } finally {
