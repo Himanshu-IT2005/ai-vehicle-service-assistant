@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+const dns = require('dns');
 require('dotenv').config();
 
 const transporter = nodemailer.createTransport({
@@ -8,6 +9,10 @@ const transporter = nodemailer.createTransport({
     auth: {
         user: process.env.SMTP_USER || '',
         pass: process.env.SMTP_PASS || ''
+    },
+    // Force Node.js to use IPv4 exclusively for host resolution (bypasses Railway's broken IPv6 network stack)
+    lookup: (hostname, options, callback) => {
+        dns.lookup(hostname, { family: 4 }, callback);
     }
 });
 
