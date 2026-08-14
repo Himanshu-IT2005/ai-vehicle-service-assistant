@@ -1,6 +1,6 @@
 const nodemailer = require('nodemailer');
 const dns = require('dns');
-const axios = require('axios');
+const https = require('https');
 require('dotenv').config();
 
 const primaryPort = parseInt(process.env.SMTP_PORT || '587');
@@ -46,27 +46,60 @@ const createMailTransporter = async (port) => {
 };
 
 // Dispatch email via Resend's secure HTTPS REST API (forces port 443, which is never blocked by cloud firewalls)
-const sendEmailViaResend = async (mailOptions) => {
-    try {
+const sendEmailViaResend = (mailOptions) => {
+    return new Promise((resolve, reject) => {
         console.log(`[Resend Mailer] Dispatching email via HTTPS API to ${mailOptions.to}...`);
-        const response = await axios.post('https://api.resend.com/emails', {
-            from: mailOptions.from || process.env.SMTP_FROM || `"DriveSync AI" <onboarding@resend.dev>`,
+
+        const postData = JSON.stringify({
+            from: mailOptions.from || process.env.SMTP_FROM || '"DriveSync AI" <onboarding@resend.dev>',
             to: mailOptions.to,
             subject: mailOptions.subject,
             html: mailOptions.html
-        }, {
+        });
+
+        const options = {
+            hostname: 'api.resend.com',
+            port: 443,
+            path: '/emails',
+            method: 'POST',
             headers: {
                 'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Content-Length': Buffer.byteLength(postData)
             }
+        };
+
+        const req = https.request(options, (res) => {
+            let data = '';
+
+            res.on('data', (chunk) => {
+                data += chunk;
+            });
+
+            res.on('end', () => {
+                if (res.statusCode >= 200 && res.statusCode < 300) {
+                    try {
+                        const parsed = JSON.parse(data);
+                        console.log(`[Resend Mailer] Email sent successfully. ID: ${parsed.id}`);
+                        resolve({ messageId: parsed.id });
+                    } catch (e) {
+                        resolve({ messageId: null });
+                    }
+                } else {
+                    console.error(`[Resend Mailer Error] API response code ${res.statusCode}: ${data}`);
+                    reject(new Error(`Resend HTTPS dispatch failed: Status ${res.statusCode} - ${data}`));
+                }
+            });
         });
-        console.log(`[Resend Mailer] Email sent successfully. ID: ${response.data.id}`);
-        return { messageId: response.data.id };
-    } catch (err) {
-        const errMsg = err.response && err.response.data ? JSON.stringify(err.response.data) : err.message;
-        console.error(`[Resend Mailer Error] API dispatch failed: ${errMsg}`);
-        throw new Error(`Resend HTTPS SMTP bypass failed: ${errMsg}`);
-    }
+
+        req.on('error', (err) => {
+            console.error(`[Resend Mailer Error] Request failed: ${err.message}`);
+            reject(err);
+        });
+
+        req.write(postData);
+        req.end();
+    });
 };
 
 const transporter = {
