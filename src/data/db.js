@@ -23,10 +23,13 @@ apiClient.interceptors.response.use((response) => {
     return response;
 }, (error) => {
     if (error.response && error.response.status === 401) {
-        localStorage.removeItem('v_token');
-        localStorage.removeItem('v_current_user');
-        if (window.location.pathname !== '/login' && window.location.pathname !== '/') {
-            window.location.href = '/login';
+        const isLoginRequest = error.config && error.config.url && error.config.url.includes('/auth/login');
+        if (!isLoginRequest) {
+            localStorage.removeItem('v_token');
+            localStorage.removeItem('v_current_user');
+            if (window.location.pathname !== '/login' && window.location.pathname !== '/' && window.location.pathname !== '/admin/login') {
+                window.location.href = '/login';
+            }
         }
     }
     return Promise.reject(error);
