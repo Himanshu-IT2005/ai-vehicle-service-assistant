@@ -157,63 +157,104 @@ export default function ServiceHistory() {
                     <p className="text-xs text-slate-500">Querying service database logs...</p>
                 </div>
             ) : filteredRecords.length === 0 ? (
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl py-12 text-center text-slate-500">
+                <div className="bg-slate-900 border border-slate-800 rounded-2xl py-12 text-center text-slate-505">
                     <ClipboardList className="w-12 h-12 mx-auto text-slate-705 mb-3" />
                     <p className="font-semibold text-slate-350">No service history found</p>
                     <p className="text-xs text-slate-505 mt-0.5">Click the "Log New Service" button to record maintenance data.</p>
                 </div>
             ) : (
-                <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse text-xs">
-                            <thead>
-                                <tr className="border-b border-slate-200 bg-slate-50 text-slate-600 uppercase tracking-wider text-[10px] font-bold">
-                                    <th className="py-4 px-6">Service Date</th>
-                                    <th className="py-4 px-6">Vehicle</th>
-                                    <th className="py-4 px-6">Service Type</th>
-                                    <th className="py-4 px-6">Odometer</th>
-                                    <th className="py-4 px-6">Service Workshop</th>
-                                    <th className="py-4 px-6">Repair Details</th>
-                                    <th className="py-4 px-6 text-right">Cost</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-100 text-slate-700">
-                                {filteredRecords.map((r) => {
-                                    const vehicleObj = vehicles.find(v => v.id.toString() === r.vehicleId?.toString());
-                                    const categoryObj = categories.find(c => c.id.toString() === r.categoryId?.toString());
-                                    return (
-                                        <tr key={r.id} className="hover:bg-slate-50 transition-colors">
-                                            <td className="py-4 px-6 whitespace-nowrap flex items-center">
-                                                <Calendar className="w-3.5 h-3.5 mr-2 text-slate-550" />
-                                                {r.serviceDate}
-                                            </td>
-                                            <td className="py-4 px-6 whitespace-nowrap font-medium text-slate-800">
-                                                {vehicleObj ? `${vehicleObj.brand} ${vehicleObj.model}` : "Unknown"}
-                                            </td>
-                                            <td className="py-4 px-6 whitespace-nowrap">
-                                                <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-205 font-semibold text-[10px]">
-                                                    {categoryObj ? categoryObj.name : "Custom Servicing"}
-                                                </span>
-                                            </td>
-                                            <td className="py-4 px-6">{r.mileageAtService.toLocaleString()} km</td>
-                                            <td className="py-4 px-6 whitespace-nowrap">{r.serviceCenter}</td>
-                                            <td className="py-4 px-6 max-w-xs truncate">
-                                                <span title={r.description}>{r.description}</span>
-                                                {r.notes && (
-                                                    <div className="text-[10px] text-slate-500 italic mt-0.5">Notes: {r.notes}</div>
-                                                )}
-                                            </td>
-                                            <td className="py-4 px-6 text-right font-bold text-green-405 whitespace-nowrap">
-                                                ₹{r.cost.toLocaleString()}
-                                            </td>
-                                        </tr>
-                                    );
-                                })}
-                            </tbody>
-                        </table>
+                <div className="space-y-4">
+                    {/* Desktop View Table */}
+                    <div className="hidden md:block bg-white border border-slate-205 rounded-2xl overflow-hidden shadow-sm">
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left border-collapse text-xs">
+                                <thead>
+                                    <tr className="border-b border-slate-200 bg-slate-50 text-slate-600 uppercase tracking-wider text-[10px] font-bold">
+                                        <th className="py-4 px-6">Service Date</th>
+                                        <th className="py-4 px-6">Vehicle</th>
+                                        <th className="py-4 px-6">Service Type</th>
+                                        <th className="py-4 px-6">Odometer</th>
+                                        <th className="py-4 px-6">Service Workshop</th>
+                                        <th className="py-4 px-6">Repair Details</th>
+                                        <th className="py-4 px-6 text-right">Cost</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-100 text-slate-700">
+                                    {filteredRecords.map((r) => {
+                                        const vehicleObj = vehicles.find(v => v.id.toString() === r.vehicleId?.toString());
+                                        const categoryObj = categories.find(c => c.id.toString() === r.categoryId?.toString());
+                                        return (
+                                            <tr key={r.id} className="hover:bg-slate-50 transition-colors">
+                                                <td className="py-4 px-6 whitespace-nowrap flex items-center">
+                                                    <Calendar className="w-3.5 h-3.5 mr-2 text-slate-550" />
+                                                    {r.serviceDate}
+                                                </td>
+                                                <td className="py-4 px-6 whitespace-nowrap font-medium text-slate-800">
+                                                    {vehicleObj ? `${vehicleObj.brand} ${vehicleObj.model}` : "Unknown"}
+                                                </td>
+                                                <td className="py-4 px-6 whitespace-nowrap">
+                                                    <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-205 font-semibold text-[10px]">
+                                                        {categoryObj ? categoryObj.name : "Custom Servicing"}
+                                                    </span>
+                                                </td>
+                                                <td className="py-4 px-6">{r.mileageAtService.toLocaleString()} km</td>
+                                                <td className="py-4 px-6 whitespace-nowrap">{r.serviceCenter}</td>
+                                                <td className="py-4 px-6 max-w-xs truncate">
+                                                    <span title={r.description}>{r.description}</span>
+                                                    {r.notes && (
+                                                        <div className="text-[10px] text-slate-500 italic mt-0.5">Notes: {r.notes}</div>
+                                                    )}
+                                                </td>
+                                                <td className="py-4 px-6 text-right font-bold text-green-405 whitespace-nowrap">
+                                                    ₹{r.cost.toLocaleString()}
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    {/* Mobile View Cards */}
+                    <div className="grid grid-cols-1 gap-4 md:hidden">
+                        {filteredRecords.map((r) => {
+                            const vehicleObj = vehicles.find(v => v.id.toString() === r.vehicleId?.toString());
+                            const categoryObj = categories.find(c => c.id.toString() === r.categoryId?.toString());
+                            return (
+                                <div key={r.id} className="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-3">
+                                    <div className="flex justify-between items-start">
+                                        <div>
+                                            <span className="text-[10px] text-slate-500 uppercase tracking-wider block">{r.serviceDate}</span>
+                                            <h4 className="font-bold text-slate-200 mt-0.5">{vehicleObj ? `${vehicleObj.brand} ${vehicleObj.model}` : "Unknown"}</h4>
+                                        </div>
+                                        <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700 font-semibold text-[9px]">
+                                            {categoryObj ? categoryObj.name : "Custom Servicing"}
+                                        </span>
+                                    </div>
+                                    <div className="text-xs text-slate-350 bg-slate-950/40 p-2.5 rounded-lg border border-slate-850">
+                                        <p className="leading-relaxed"><strong className="text-slate-300 font-medium">Work Done:</strong> {r.description}</p>
+                                        {r.notes && (
+                                            <p className="mt-1 text-[10px] text-slate-400 italic"><strong className="not-italic text-slate-300">Notes:</strong> {r.notes}</p>
+                                        )}
+                                    </div>
+                                    <div className="flex justify-between items-center text-[11px] pt-1.5 border-t border-slate-800/80">
+                                        <div className="text-slate-405">
+                                            <span className="block text-[9px] text-slate-500 uppercase tracking-widest font-bold">Odometer / Location</span>
+                                            {r.mileageAtService.toLocaleString()} km • {r.serviceCenter}
+                                        </div>
+                                        <div className="text-right">
+                                            <span className="block text-[9px] text-slate-500 uppercase tracking-widest font-bold">Invoice Cost</span>
+                                            <span className="font-bold text-green-400">₹{r.cost.toLocaleString()}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
             )}
+
 
             {/* Add New Service Modal Dialog */}
             {showAddForm && (

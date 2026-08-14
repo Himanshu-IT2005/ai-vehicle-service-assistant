@@ -99,76 +99,137 @@ export default function AdminUsersList() {
                     <p className="text-xs text-slate-500 font-mono">Running directories lookup...</p>
                 </div>
             ) : (
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-md">
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse text-xs">
-                            <thead>
-                                <tr className="border-b border-slate-805 bg-slate-950 text-slate-400 uppercase tracking-widest text-[9px] font-bold">
-                                    <th className="py-4 px-6">User Details</th>
-                                    <th className="py-4 px-6">Account Type (Role)</th>
-                                    <th className="py-4 px-6">Created On</th>
-                                    <th className="py-4 px-6">Account Status</th>
-                                    <th className="py-4 px-6 text-right">Settings Controls</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-800 text-slate-300">
-                                {filteredUsers.map(u => (
-                                    <tr key={u.id} className="hover:bg-slate-950/40 transition-colors">
-                                        <td className="py-4 px-6">
-                                            <div className="font-semibold text-slate-202 text-sm">{u.name}</div>
-                                            <div className="text-[10px] text-slate-506 block mt-0.5">{u.email}</div>
-                                            {u.phone && <div className="text-[10px] text-slate-550 block">{u.phone}</div>}
-                                        </td>
-                                        <td className="py-4 px-6 whitespace-nowrap">
-                                            <span className={`px-2 py-0.5 rounded text-[9px] font-bold border ${u.role === 'admin'
+                <div className="space-y-4">
+                    {/* Desktop View Table */}
+                    <div className="hidden md:block bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-md">
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left border-collapse text-xs">
+                                <thead>
+                                    <tr className="border-b border-slate-805 bg-slate-950 text-slate-400 uppercase tracking-widest text-[9px] font-bold">
+                                        <th className="py-4 px-6">User Details</th>
+                                        <th className="py-4 px-6">Account Type (Role)</th>
+                                        <th className="py-4 px-6">Created On</th>
+                                        <th className="py-4 px-6">Account Status</th>
+                                        <th className="py-4 px-6 text-right">Settings Controls</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-800 text-slate-300">
+                                    {filteredUsers.map(u => (
+                                        <tr key={u.id} className="hover:bg-slate-955/40 transition-colors">
+                                            <td className="py-4 px-6">
+                                                <div className="font-semibold text-slate-202 text-sm">{u.name}</div>
+                                                <div className="text-[10px] text-slate-506 block mt-0.5">{u.email}</div>
+                                                {u.phone && <div className="text-[10px] text-slate-550 block">{u.phone}</div>}
+                                            </td>
+                                            <td className="py-4 px-6 whitespace-nowrap">
+                                                <span className={`px-2 py-0.5 rounded text-[9px] font-bold border ${u.role === 'admin'
+                                                    ? 'bg-rose-955/60 text-rose-400 border-rose-900/30'
+                                                    : 'bg-blue-950/60 text-blue-400 border-blue-900/30'
+                                                    }`}>
+                                                    {u.role.toUpperCase()}
+                                                </span>
+                                            </td>
+                                            <td className="py-4 px-6 whitespace-nowrap">
+                                                {u.created_at ? new Date(u.created_at).toLocaleDateString() : 'N/A'}
+                                            </td>
+                                            <td className="py-4 px-6 whitespace-nowrap">
+                                                <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-bold ${u.status === 'active'
+                                                    ? 'bg-green-950 text-green-400'
+                                                    : 'bg-red-955 text-red-400'
+                                                    }`}>
+                                                    {u.status.toUpperCase()}
+                                                </span>
+                                            </td>
+                                            <td className="py-4 px-6 text-right whitespace-nowrap space-x-1.5">
+                                                <button
+                                                    onClick={() => handleToggleRole(u.id, u.role)}
+                                                    className="px-2.5 py-1.5 bg-slate-950 border border-slate-805 hover:bg-slate-800 text-slate-205 rounded font-semibold transition-all inline-flex items-center"
+                                                    title="Swap Admin/Owner status"
+                                                >
+                                                    <ShieldCheck className="w-3.5 h-3.5 mr-1 text-slate-500" /> TOGGLE ROLE
+                                                </button>
+                                                <button
+                                                    onClick={() => handleToggleSuspend(u.id, u.status)}
+                                                    className={`px-2.5 py-1.5 border rounded font-semibold transition-all inline-flex items-center ${u.status === 'suspended'
+                                                        ? 'bg-green-955/40 border-green-900/30 text-green-400 hover:bg-green-950/60'
+                                                        : 'bg-red-955/40 border-red-900/30 text-red-400 hover:bg-red-950/60'
+                                                        }`}
+                                                >
+                                                    <Ban className="w-3.5 h-3.5 mr-1" /> {u.status === 'suspended' ? "ACTIVATE" : "SUSPEND"}
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDeleteUser(u.id)}
+                                                    className="p-1.5 bg-slate-950 border border-slate-805 text-slate-500 hover:text-red-400 hover:bg-slate-800 rounded transition-all inline-flex align-middle"
+                                                    title="Delete User permanently"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    {/* Mobile View Cards */}
+                    <div className="grid grid-cols-1 gap-4 md:hidden">
+                        {filteredUsers.map(u => (
+                            <div key={u.id} className="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-3">
+                                <div className="flex justify-between items-start">
+                                    <div>
+                                        <div className="flex items-center space-x-2">
+                                            <h4 className="font-bold text-slate-200 text-sm">{u.name}</h4>
+                                            <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold border ${u.role === 'admin'
                                                 ? 'bg-rose-955/60 text-rose-400 border-rose-900/30'
                                                 : 'bg-blue-950/60 text-blue-400 border-blue-900/30'
                                                 }`}>
                                                 {u.role.toUpperCase()}
                                             </span>
-                                        </td>
-                                        <td className="py-4 px-6 whitespace-nowrap">
-                                            {u.created_at ? new Date(u.created_at).toLocaleDateString() : 'N/A'}
-                                        </td>
-                                        <td className="py-4 px-6 whitespace-nowrap">
-                                            <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-bold ${u.status === 'active'
-                                                ? 'bg-green-950 text-green-400'
-                                                : 'bg-red-955 text-red-400'
-                                                }`}>
-                                                {u.status.toUpperCase()}
-                                            </span>
-                                        </td>
-                                        <td className="py-4 px-6 text-right whitespace-nowrap space-x-1.5">
-                                            <button
-                                                onClick={() => handleToggleRole(u.id, u.role)}
-                                                className="px-2.5 py-1.5 bg-slate-950 border border-slate-805 hover:bg-slate-800 text-slate-205 rounded font-semibold transition-all inline-flex items-center"
-                                                title="Swap Admin/Owner status"
-                                            >
-                                                <ShieldCheck className="w-3.5 h-3.5 mr-1 text-slate-500" /> TOGGLE ROLE
-                                            </button>
-                                            <button
-                                                onClick={() => handleToggleSuspend(u.id, u.status)}
-                                                className={`px-2.5 py-1.5 border rounded font-semibold transition-all inline-flex items-center ${u.status === 'suspended'
-                                                    ? 'bg-green-955/40 border-green-900/30 text-green-400 hover:bg-green-950/60'
-                                                    : 'bg-red-955/40 border-red-900/30 text-red-400 hover:bg-red-950/60'
-                                                    }`}
-                                            >
-                                                <Ban className="w-3.5 h-3.5 mr-1" /> {u.status === 'suspended' ? "ACTIVATE" : "SUSPEND"}
-                                            </button>
-                                            <button
-                                                onClick={() => handleDeleteUser(u.id)}
-                                                className="p-1.5 bg-slate-950 border border-slate-805 text-slate-500 hover:text-red-400 hover:bg-slate-800 rounded transition-all inline-flex align-middle"
-                                                title="Delete User permanently"
-                                            >
-                                                <Trash2 className="w-4 h-4" />
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                        </div>
+                                        <span className="text-[10px] text-slate-500 block mt-0.5">{u.email}</span>
+                                        {u.phone && <span className="text-[10px] text-slate-550 block">{u.phone}</span>}
+                                    </div>
+                                    <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${u.status === 'active'
+                                        ? 'bg-green-950 text-green-400'
+                                        : 'bg-red-955 text-red-400'
+                                        }`}>
+                                        {u.status.toUpperCase()}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between items-center text-[10px] text-slate-500 pt-2 border-t border-slate-800/80">
+                                    <span>Joined: {u.created_at ? new Date(u.created_at).toLocaleDateString() : 'N/A'}</span>
+                                </div>
+                                <div className="flex flex-wrap gap-2 pt-1 justify-end">
+                                    <button
+                                        onClick={() => handleToggleRole(u.id, u.role)}
+                                        className="px-2 py-1 bg-slate-950 border border-slate-805 hover:bg-slate-800 text-slate-300 rounded text-[9px] font-semibold flex items-center"
+                                        title="Swap Admin/Owner status"
+                                    >
+                                        <ShieldCheck className="w-3.5 h-3.5 mr-1 text-slate-500" /> ROLE
+                                    </button>
+                                    <button
+                                        onClick={() => handleToggleSuspend(u.id, u.status)}
+                                        className={`px-2 py-1 border rounded text-[9px] font-semibold flex items-center ${u.status === 'suspended'
+                                            ? 'bg-green-955/40 border-green-900/30 text-green-400'
+                                            : 'bg-red-955/40 border-red-900/30 text-red-400'
+                                            }`}
+                                    >
+                                        <Ban className="w-3.5 h-3.5 mr-1" /> {u.status === 'suspended' ? "ACTIVATE" : "SUSPEND"}
+                                    </button>
+                                    <button
+                                        onClick={() => handleDeleteUser(u.id)}
+                                        className="px-2 py-1 bg-slate-950 border border-slate-805 text-slate-500 hover:text-red-400 rounded text-[9px] font-semibold flex items-center"
+                                        title="Delete User permanently"
+                                    >
+                                        <Trash2 className="w-3.5 h-3.5 mr-1" /> DELETE
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 </div>
+
             )}
         </div>
     );

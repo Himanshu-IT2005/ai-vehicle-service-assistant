@@ -91,76 +91,132 @@ export default function AdminVehiclesList() {
                     <p className="text-xs text-slate-500 font-mono">Running fleet diagnostic audit...</p>
                 </div>
             ) : (
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-md">
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse text-xs">
-                            <thead>
-                                <tr className="border-b border-slate-800 bg-slate-950 text-slate-400 uppercase tracking-widest text-[9px] font-bold">
-                                    <th className="py-4 px-6">Profile Specs</th>
-                                    <th className="py-4 px-6">Registration Tag</th>
-                                    <th className="py-4 px-6">Account Holder (Owner)</th>
-                                    <th className="py-4 px-6">Diagnostic Health</th>
-                                    <th className="py-4 px-6 text-right font-bold">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-800 text-slate-300">
-                                {filteredVehicles.length === 0 ? (
-                                    <tr>
-                                        <td colSpan="5" className="py-8 text-center text-slate-500">
-                                            No vehicles found matching search criteria.
-                                        </td>
+                <div className="space-y-4">
+                    {/* Desktop View Table */}
+                    <div className="hidden md:block bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-md">
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left border-collapse text-xs">
+                                <thead>
+                                    <tr className="border-b border-slate-800 bg-slate-950 text-slate-400 uppercase tracking-widest text-[9px] font-bold">
+                                        <th className="py-4 px-6">Profile Specs</th>
+                                        <th className="py-4 px-6">Registration Tag</th>
+                                        <th className="py-4 px-6">Account Holder (Owner)</th>
+                                        <th className="py-4 px-6">Diagnostic Health</th>
+                                        <th className="py-4 px-6 text-right font-bold">Actions</th>
                                     </tr>
-                                ) : (
-                                    filteredVehicles.map(v => {
-                                        const owner = users.find(u => u.id === v.userId);
-                                        return (
-                                            <tr key={v.id} className="hover:bg-slate-950/40 transition-colors">
-                                                <td className="py-4 px-6">
-                                                    <div className="font-semibold text-slate-202 text-sm">{v.brand} {v.model}</div>
-                                                    <div className="text-[10px] text-slate-505 mt-0.5 flex items-center">
-                                                        <Fuel className="w-3.5 h-3.5 mr-1" /> {v.year} • {v.fuelType.toUpperCase()} Engine
-                                                    </div>
-                                                </td>
-                                                <td className="py-4 px-6 whitespace-nowrap font-mono font-semibold text-slate-350 tracking-wider">
-                                                    {v.registrationNumber}
-                                                </td>
-                                                <td className="py-4 px-6">
-                                                    {owner ? (
-                                                        <div>
-                                                            <div className="text-slate-300 font-medium">{owner.name}</div>
-                                                            <span className="text-[10px] text-slate-505">{owner.email}</span>
+                                </thead>
+                                <tbody className="divide-y divide-slate-800 text-slate-300">
+                                    {filteredVehicles.length === 0 ? (
+                                        <tr>
+                                            <td colSpan="5" className="py-8 text-center text-slate-500">
+                                                No vehicles found matching search criteria.
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        filteredVehicles.map(v => {
+                                            const owner = users.find(u => u.id === v.userId);
+                                            return (
+                                                <tr key={v.id} className="hover:bg-slate-955/40 transition-colors">
+                                                    <td className="py-4 px-6">
+                                                        <div className="font-semibold text-slate-202 text-sm">{v.brand} {v.model}</div>
+                                                        <div className="text-[10px] text-slate-505 mt-0.5 flex items-center">
+                                                            <Fuel className="w-3.5 h-3.5 mr-1" /> {v.year} • {v.fuelType.toUpperCase()} Engine
                                                         </div>
-                                                    ) : (
-                                                        <span className="text-slate-550 italic">Orphan Record</span>
-                                                    )}
-                                                </td>
-                                                <td className="py-4 px-6 whitespace-nowrap">
-                                                    <div className="flex items-center space-x-2">
-                                                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${v.healthScore >= 85
+                                                    </td>
+                                                    <td className="py-4 px-6 whitespace-nowrap font-mono font-semibold text-slate-350 tracking-wider">
+                                                        {v.registrationNumber}
+                                                    </td>
+                                                    <td className="py-4 px-6">
+                                                        {owner ? (
+                                                            <div>
+                                                                <div className="text-slate-300 font-medium">{owner.name}</div>
+                                                                <span className="text-[10px] text-slate-505">{owner.email}</span>
+                                                            </div>
+                                                        ) : (
+                                                            <span className="text-slate-550 italic">Orphan Record</span>
+                                                        )}
+                                                    </td>
+                                                    <td className="py-4 px-6 whitespace-nowrap">
+                                                        <div className="flex items-center space-x-2">
+                                                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${v.healthScore >= 85
                                                                 ? 'bg-green-950/60 text-green-400 border-green-905/30'
                                                                 : v.healthScore >= 70
                                                                     ? 'bg-amber-955/65 text-amber-450 border-amber-900/20'
                                                                     : 'bg-red-955 border border-red-900/30 text-red-400'
-                                                            }`}>
-                                                            Health: {v.healthScore}%
-                                                        </span>
-                                                    </div>
-                                                </td>
-                                                <td className="py-4 px-6 text-right whitespace-nowrap">
-                                                    <button
-                                                        onClick={() => handleDeleteVehicle(v.id)}
-                                                        className="px-2.5 py-1.5 bg-slate-950 border border-slate-805 hover:bg-red-950/40 hover:text-red-400 text-slate-400 rounded font-semibold transition-all inline-flex items-center"
-                                                        title="Remove vehicle registry"
-                                                    >
-                                                        <Trash2 className="w-3.5 h-3.5 mr-1" /> DELETE REGISTRY
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        );
-                                    })
-                                )}
-                            </tbody>
-                        </table>
+                                                                }`}>
+                                                                Health: {v.healthScore}%
+                                                            </span>
+                                                        </div>
+                                                    </td>
+                                                    <td className="py-4 px-6 text-right whitespace-nowrap">
+                                                        <button
+                                                            onClick={() => handleDeleteVehicle(v.id)}
+                                                            className="px-2.5 py-1.5 bg-slate-950 border border-slate-805 hover:bg-red-955/40 hover:text-red-405 text-slate-400 rounded font-semibold transition-all inline-flex items-center"
+                                                            title="Remove vehicle registry"
+                                                        >
+                                                            <Trash2 className="w-3.5 h-3.5 mr-1" /> DELETE REGISTRY
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    {/* Mobile View Cards */}
+                    <div className="grid grid-cols-1 gap-4 md:hidden">
+                        {filteredVehicles.length === 0 ? (
+                            <div className="bg-slate-900 border border-slate-850 p-6 rounded-xl text-center text-slate-500">
+                                No vehicles found matching search criteria.
+                            </div>
+                        ) : (
+                            filteredVehicles.map(v => {
+                                const owner = users.find(u => u.id === v.userId);
+                                return (
+                                    <div key={v.id} className="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-3">
+                                        <div className="flex justify-between items-start">
+                                            <div>
+                                                <h4 className="font-bold text-slate-200 text-sm">{v.brand} {v.model}</h4>
+                                                <span className="text-[10px] text-slate-500 block uppercase font-semibold">{v.registrationNumber}</span>
+                                            </div>
+                                            <span className={`px-2 py-0.5 rounded text-[9px] font-bold border ${v.healthScore >= 85
+                                                ? 'bg-green-955/65 text-green-400 border-green-905/30'
+                                                : v.healthScore >= 70
+                                                    ? 'bg-amber-955/65 text-amber-450 border-amber-900/20'
+                                                    : 'bg-red-955 border border-red-900/30 text-red-400'
+                                                }`}>
+                                                Health: {v.healthScore}%
+                                            </span>
+                                        </div>
+                                        <div className="text-xs text-slate-350 bg-slate-950/40 p-2.5 rounded-lg border border-slate-850 space-y-1">
+                                            <p className="flex justify-between">
+                                                <span className="text-slate-500 font-medium">Specs:</span>
+                                                <span className="text-slate-300 font-semibold">{v.year} • {v.fuelType.toUpperCase()}</span>
+                                            </p>
+                                            <p className="flex justify-between">
+                                                <span className="text-slate-500 font-medium">Owner:</span>
+                                                <span className="text-slate-300 font-semibold text-right">{owner ? owner.name : "Orphan"}</span>
+                                            </p>
+                                            {owner && (
+                                                <p className="text-right text-[10px] text-slate-500">{owner.email}</p>
+                                            )}
+                                        </div>
+                                        <div className="flex justify-end pt-1">
+                                            <button
+                                                onClick={() => handleDeleteVehicle(v.id)}
+                                                className="px-2.5 py-1 bg-slate-950 border border-slate-805 hover:bg-red-955/40 hover:text-red-400 text-slate-400 rounded text-[10px] font-semibold flex items-center"
+                                                title="Remove vehicle registry"
+                                            >
+                                                <Trash2 className="w-3.5 h-3.5 mr-1" /> DELETE REGISTRY
+                                            </button>
+                                        </div>
+                                    </div>
+                                );
+                            })
+                        )}
                     </div>
                 </div>
             )}

@@ -187,64 +187,107 @@ export default function Expenses() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
                     {/* List/Table of expenses */}
-                    <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-md">
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left border-collapse text-xs">
-                                <thead>
-                                    <tr className="border-b border-slate-800 bg-slate-950 text-slate-400 uppercase tracking-widest text-[9px] font-bold">
-                                        <th className="py-4 px-5">Expense Date</th>
-                                        <th className="py-4 px-5">Vehicle</th>
-                                        <th className="py-4 px-5">Type / Category</th>
-                                        <th className="py-4 px-5">Description</th>
-                                        <th className="py-4 px-5 text-right">Cost</th>
-                                        <th className="py-4 px-5"></th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-800 text-slate-300">
-                                    {filteredExpenses.length === 0 ? (
-                                        <tr>
-                                            <td colSpan="6" className="py-8 text-center text-slate-505">
-                                                No financial logs indexed matching search conditions.
-                                            </td>
+                    <div className="lg:col-span-2 space-y-4">
+                        {/* Desktop View Table */}
+                        <div className="hidden md:block bg-slate-900 border border-slate-805 rounded-2xl overflow-hidden shadow-md">
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left border-collapse text-xs">
+                                    <thead>
+                                        <tr className="border-b border-slate-800 bg-slate-950 text-slate-400 uppercase tracking-widest text-[9px] font-bold">
+                                            <th className="py-4 px-5">Expense Date</th>
+                                            <th className="py-4 px-5">Vehicle</th>
+                                            <th className="py-4 px-5">Type / Category</th>
+                                            <th className="py-4 px-5">Description</th>
+                                            <th className="py-4 px-5 text-right">Cost</th>
+                                            <th className="py-4 px-5"></th>
                                         </tr>
-                                    ) : (
-                                        filteredExpenses.map((exp) => {
-                                            const veh = vehicles.find(v => v.id === exp.vehicleId);
-                                            const cat = categories.find(c => c.id === exp.categoryId);
-                                            return (
-                                                <tr key={exp.id} className="hover:bg-slate-950/40 transition-colors">
-                                                    <td className="py-4 px-5 whitespace-nowrap flex items-center">
-                                                        <Calendar className="w-3.5 h-3.5 mr-1.5 text-slate-500" />
-                                                        {exp.expenseDate}
-                                                    </td>
-                                                    <td className="py-4 px-5 whitespace-nowrap font-medium text-slate-200">
-                                                        {veh ? `${veh.brand} ${veh.model}` : "Unknown"}
-                                                    </td>
-                                                    <td className="py-4 px-5 whitespace-nowrap">
-                                                        <span className="px-2.5 py-0.5 rounded bg-slate-955 text-slate-400 border border-slate-800 text-[9px]">
-                                                            {cat ? cat.name : "Other"}
-                                                        </span>
-                                                    </td>
-                                                    <td className="py-4 px-5 max-w-xs truncate">{exp.description}</td>
-                                                    <td className="py-4 px-5 text-right font-bold text-white">
-                                                        ₹{exp.amount.toLocaleString()}
-                                                    </td>
-                                                    <td className="py-4 px-5 text-right">
-                                                        <button
-                                                            onClick={() => handleDelete(exp.id)}
-                                                            className="text-slate-550 hover:text-red-400 p-1 rounded hover:bg-slate-800"
-                                                        >
-                                                            <X className="w-4.5 h-4.5" />
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            );
-                                        })
-                                    )}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-800 text-slate-300">
+                                        {filteredExpenses.length === 0 ? (
+                                            <tr>
+                                                <td colSpan="6" className="py-8 text-center text-slate-505">
+                                                    No financial logs indexed matching search conditions.
+                                                </td>
+                                            </tr>
+                                        ) : (
+                                            filteredExpenses.map((exp) => {
+                                                const veh = vehicles.find(v => v.id === exp.vehicleId);
+                                                const cat = categories.find(c => c.id === exp.categoryId);
+                                                return (
+                                                    <tr key={exp.id} className="hover:bg-slate-955/40 transition-colors">
+                                                        <td className="py-4 px-5 whitespace-nowrap flex items-center">
+                                                            <Calendar className="w-3.5 h-3.5 mr-1.5 text-slate-500" />
+                                                            {exp.expenseDate}
+                                                        </td>
+                                                        <td className="py-4 px-5 whitespace-nowrap font-medium text-slate-202">
+                                                            {veh ? `${veh.brand} ${veh.model}` : "Unknown"}
+                                                        </td>
+                                                        <td className="py-4 px-5 whitespace-nowrap">
+                                                            <span className="px-2.5 py-0.5 rounded bg-slate-955 text-slate-400 border border-slate-800 text-[9px]">
+                                                                {cat ? cat.name : "Other"}
+                                                            </span>
+                                                        </td>
+                                                        <td className="py-4 px-5 max-w-xs truncate">{exp.description}</td>
+                                                        <td className="py-4 px-5 text-right font-bold text-white">
+                                                            ₹{exp.amount.toLocaleString()}
+                                                        </td>
+                                                        <td className="py-4 px-5 text-right">
+                                                            <button
+                                                                onClick={() => handleDelete(exp.id)}
+                                                                className="text-slate-550 hover:text-red-400 p-1 rounded hover:bg-slate-800"
+                                                            >
+                                                                <X className="w-4.5 h-4.5" />
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        {/* Mobile View Cards */}
+                        <div className="grid grid-cols-1 gap-4 md:hidden">
+                            {filteredExpenses.length === 0 ? (
+                                <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 text-center text-slate-500">
+                                    No financial logs indexed matching search conditions.
+                                </div>
+                            ) : (
+                                filteredExpenses.map((exp) => {
+                                    const veh = vehicles.find(v => v.id === exp.vehicleId);
+                                    const cat = categories.find(c => c.id === exp.categoryId);
+                                    return (
+                                        <div key={exp.id} className="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-3">
+                                            <div className="flex justify-between items-start">
+                                                <div>
+                                                    <span className="text-[10px] text-slate-500 block">{exp.expenseDate}</span>
+                                                    <h4 className="font-bold text-slate-200 mt-0.5">{veh ? `${veh.brand} ${veh.model}` : "Unknown"}</h4>
+                                                </div>
+                                                <span className="px-2 py-0.5 rounded bg-slate-850 text-slate-400 border border-slate-800 text-[9px]">
+                                                    {cat ? cat.name : "Other"}
+                                                </span>
+                                            </div>
+                                            <div className="flex justify-between items-center text-xs">
+                                                <span className="text-slate-350">{exp.description}</span>
+                                                <div className="flex items-center space-x-3">
+                                                    <span className="font-bold text-white">₹{exp.amount.toLocaleString()}</span>
+                                                    <button
+                                                        onClick={() => handleDelete(exp.id)}
+                                                        className="text-slate-500 hover:text-red-400 p-1 bg-slate-950/40 rounded border border-slate-850"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })
+                            )}
                         </div>
                     </div>
+
 
                     {/* Allocation of costs widget */}
                     <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
