@@ -123,7 +123,7 @@ export default function OwnerLayout({ children }) {
             {/* Main Panel */}
             <div className="flex-1 flex flex-col overflow-hidden">
                 {/* Header */}
-                <header className="h-16 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-6 z-10">
+                <header className="h-16 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-4 sm:px-6 z-10">
                     {/* Mobile Menu trigger */}
                     <button
                         onClick={() => setMobileMenuOpen(true)}
@@ -142,7 +142,7 @@ export default function OwnerLayout({ children }) {
                         />
                     </div>
 
-                    <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-3 sm:space-x-4">
                         {/* Notifications Dropdown */}
                         <div className="relative">
                             <button
@@ -159,7 +159,7 @@ export default function OwnerLayout({ children }) {
                                         className="fixed inset-0 z-20"
                                         onClick={() => setNotificationsOpen(false)}
                                     ></div>
-                                    <div className="absolute right-0 mt-2 w-80 bg-slate-900 border border-slate-800 rounded-xl shadow-xl z-30 overflow-hidden">
+                                    <div className="absolute right-0 mt-2 w-[calc(100vw-2.5rem)] max-w-xs sm:w-80 bg-slate-900 border border-slate-800 rounded-xl shadow-xl z-30 overflow-hidden">
                                         <div className="p-4 border-b border-slate-800 flex justify-between items-center">
                                             <span className="font-semibold text-sm">Notifications</span>
                                             <span className="text-xs text-blue-400 cursor-pointer hover:underline">Mark all read</span>
@@ -178,7 +178,7 @@ export default function OwnerLayout({ children }) {
                         </div>
 
                         {/* Quick Profile Icon Link */}
-                        <Link to="/profile" className="flex items-center space-x-2 md:opacity-100 transition-opacity">
+                        <Link to="/profile" className="flex items-center space-x-2 transition-opacity">
                             <img
                                 src={user?.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=120"}
                                 alt="Profile"
@@ -189,7 +189,7 @@ export default function OwnerLayout({ children }) {
                 </header>
 
                 {/* Content Body */}
-                <main className="flex-1 overflow-y-auto bg-slate-950 p-6 md:p-8">
+                <main className="flex-1 overflow-y-auto bg-slate-950 p-4 sm:p-6 md:p-8">
                     <div className="max-w-7xl mx-auto">
                         {children}
                     </div>
@@ -219,7 +219,7 @@ export default function OwnerLayout({ children }) {
                         <div className="flex-1 h-0 pt-5 pb-4 overflow-y-auto">
                             <div className="flex-shrink-0 flex items-center px-4 mb-8">
                                 <span className="p-1 px-2.5 bg-blue-600 rounded-lg text-white font-bold mr-2 text-sm">DS</span>
-                                <span className="text-md font-bold tracking-wider text-slate-800">DRIVESYNC AI</span>
+                                <span className="text-md font-bold tracking-wider bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">DRIVESYNC AI</span>
                             </div>
                             <nav className="px-2 space-y-1">
                                 {menuItems.map((item) => {

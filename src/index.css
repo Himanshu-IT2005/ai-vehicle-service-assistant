@@ -3,285 +3,71 @@
 @tailwind utilities;
 
 @layer base {
+
+  html,
   body {
-    @apply bg-slate-50 text-slate-900 antialiased;
+    overflow-x: hidden;
+    max-width: 100vw;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-slate-950 text-slate-100 antialiased selection:bg-blue-600 selection:text-white;
     font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    background-color: #f8fafc !important;
-    color: #0f172a !important;
   }
 }
 
-/* --- LIGHT THEME DYNAMIC OVERRIDES --- */
-:root {
-  --bg-primary: #f8fafc;
-  --bg-secondary: #ffffff;
-  --border-color: #e2e8f0;
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-muted: #64748b;
-  --accent-blue: #2563eb;
-  --accent-rose: #be123c;
+/* Custom Sleek Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
 
-/* Page Elements & Cards */
-.bg-slate-950,
-.bg-slate-900\/50,
-.bg-slate-900 {
-  background-color: var(--bg-secondary) !important;
+::-webkit-scrollbar-track {
+  background: #020617;
 }
 
-body,
-#root,
-.min-h-screen {
-  background-color: var(--bg-primary) !important;
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 9999px;
 }
 
-/* Glassmorphic Panel overlays */
-.bg-slate-950\/40,
-.bg-slate-950\/50,
-.bg-slate-975,
-.bg-slate-900\/90,
-.bg-slate-900\/40 {
-  background-color: rgba(255, 255, 255, 0.75) !important;
-  backdrop-filter: blur(12px) !important;
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
 }
 
-/* Inputs and Forms */
-input,
-select,
-textarea,
-button[type="button"].bg-slate-800,
-.bg-slate-955 {
-  background-color: var(--bg-primary) !important;
-  border-color: var(--border-color) !important;
-  color: var(--text-primary) !important;
+/* Custom Utilities for Glassmorphism & UI Enhancements */
+@layer utilities {
+  .glass-card {
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(51, 65, 85, 0.5);
+  }
+
+  .glass-nav {
+    background: rgba(2, 6, 23, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(30, 41, 59, 0.7);
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-blue-500 via-indigo-400 to-cyan-400 bg-clip-text text-transparent;
+  }
+
+  .gradient-border {
+    position: relative;
+    border-radius: 1rem;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(99, 102, 241, 0.1));
+  }
 }
 
-input::placeholder,
-select::placeholder {
-  color: var(--text-muted) !important;
-}
-
-/* Text and Titles */
-.text-slate-100,
-.text-slate-150,
-.text-slate-200,
-.text-slate-202,
-.text-slate-205,
-.text-slate-300,
-.text-slate-350,
-.text-white {
-  color: var(--text-primary) !important;
-}
-
-.text-slate-400,
-.text-slate-450,
-.text-slate-500,
-.text-slate-505,
-.text-slate-555,
-.text-slate-550,
-.text-slate-605,
-.text-slate-600,
-.text-slate-655 {
-  color: var(--text-secondary) !important;
-}
-
-/* Borders */
-.border-slate-800,
-.border-slate-805,
-.border-slate-850,
-.border-slate-700,
-.border-slate-900\/20 {
-  border-color: var(--border-color) !important;
-}
-
-/* --- NAVIGATION & SIDEBAR COMPONENT CORRECTIONS --- */
-
-/* Inactive Sidebar link hover states (Prevent dark items) */
-.hover\:bg-slate-800:hover {
-  background-color: #f1f5f9 !important;
-  color: var(--text-primary) !important;
-}
-
-/* Active Owner Link */
-.bg-blue-600\/15 {
-  background-color: #eff6ff !important;
-}
-
-.text-blue-400 {
-  color: var(--accent-blue) !important;
-}
-
-.text-blue-450 {
-  color: #1d4ed8 !important;
-}
-
-/* Active Admin Link */
-.bg-rose-600\/10 {
-  background-color: #fff1f2 !important;
-}
-
-.text-rose-400,
-.text-rose-455 {
-  color: var(--accent-rose) !important;
-}
-
-.text-rose-450 {
-  color: #9f1239 !important;
-  /* Rose 800 */
-}
-
-.border-rose-900\/30 {
-  border-color: #fecdd3 !important;
-  /* Rose 200 */
-}
-
-.bg-rose-950\/5 {
-  background-color: #fff1f2 !important;
-  /* Rose 50 */
-}
-
-/* Admin Portal Toggle Button */
-.bg-blue-900\/30 {
-  background-color: #eff6ff !important;
-  color: #1d4ed8 !important;
-  border-color: #bfdbfe !important;
-}
-
-.hover\:bg-blue-905\/50:hover,
-.hover\:bg-blue-900\/50:hover {
-  background-color: #dbeafe !important;
-  color: #1d4ed8 !important;
-  border-color: #93c5fd !important;
-}
-
-/* SYSTEM ADMIN Header tag badge */
-.bg-rose-950\/30 {
-  background-color: #fff1f2 !important;
-  color: var(--accent-rose) !important;
-  border-color: #fecdd3 !important;
-}
-
-/* Logout Button styling */
-.bg-slate-800.text-slate-350,
-.bg-slate-800.text-slate-350.border-slate-700\/80 {
-  background-color: #f1f5f9 !important;
-  color: #475569 !important;
-  border-color: var(--border-color) !important;
-}
-
-.bg-slate-800.text-slate-350:hover {
-  background-color: #fee2e2 !important;
-  color: #ef4444 !important;
-  border-color: #fca5a5 !important;
-}
-
-/* Counter notification dot badge */
-.bg-red-500 {
-  background-color: #ef4444 !important;
-}
-
-.border-slate-900 {
-  border-color: #ffffff !important;
-}
-
-/* Header Bell Icon Button */
-.bg-slate-800.text-slate-350,
-.bg-slate-800.text-slate-300.relative.border,
-.bg-slate-800.text-slate-300.border-slate-700 {
-  background-color: var(--bg-secondary) !important;
-  color: var(--text-secondary) !important;
-  border-color: var(--border-color) !important;
-}
-
-.bg-slate-800.text-slate-300.border-slate-700:hover,
-.bg-slate-800.text-slate-300.relative.border:hover {
-  background-color: #f1f5f9 !important;
-  border-color: #cbd5e1 !important;
-  color: var(--text-primary) !important;
-}
-
-/* Vehicle Card Status Badges (Green, Yellow, Red) */
-.bg-green-950\/60 {
-  background-color: #f0fdf4 !important;
-  color: #166534 !important;
-  /* Green 800 */
-  border-color: #bbf7d0 !important;
-  /* Green 200 */
-}
-
-.bg-amber-955\/60 {
-  background-color: #fffbeb !important;
-  color: #92400e !important;
-  /* Amber 800 */
-  border-color: #fde68a !important;
-  /* Amber 200 */
-}
-
-.bg-red-955\/60 {
-  background-color: #fef2f2 !important;
-  color: #991b1b !important;
-  /* Red 800 */
-  border-color: #fca5a5 !important;
-  /* Red 200 */
-}
-
-/* Vehicle Card Details Bottom Bar */
-.bg-slate-900\/60,
-.bg-slate-909\/30,
-.bg-slate-950\/60 {
-  background-color: rgba(241, 245, 249, 0.45) !important;
-}
-
-.border-slate-800\/85,
-.border-slate-800\/60 {
-  border-color: var(--border-color) !important;
-}
-
-/* Hover overrides for slate-700 actions and delete button red highlights */
-.hover\:bg-slate-700:hover {
-  background-color: #e2e8f0 !important;
-  color: var(--text-primary) !important;
-}
-
-.hover\:bg-red-955\/60:hover,
-.hover\:bg-red-950\/40:hover {
-  background-color: #fee2e2 !important;
-  color: #ef4444 !important;
-  border-color: #fca5a5 !important;
-}
-
-/* Additional health status pills (amber) */
-.bg-amber-955\/65 {
-  background-color: #fffbeb !important;
-  color: #92400e !important;
-  border-color: #fde68a !important;
-}
-
-/* Notification List line breaks and hovers */
-.divide-slate-800>* {
-  border-color: var(--border-color) !important;
-}
-
-.hover\:bg-slate-800\/40:hover {
-  background-color: rgba(241, 245, 249, 0.6) !important;
-}
-
-/* --- BRANDING / BUTTON ACTIONS --- */
-.bg-blue-600,
-.bg-red-500,
-.bg-rose-600,
-.bg-amber-600,
-.bg-green-600,
-.text-white.bg-blue-600 {
-  color: #ffffff !important;
-}
-
-/* --- MICRO-ANIMATIONS --- */
+/* Smooth Micro-animations */
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(14px);
+    transform: translateY(12px);
   }
 
   to {
@@ -290,30 +76,14 @@ select::placeholder {
   }
 }
 
-/* Slide Up Page entry */
-main,
-.grid,
-iframe {
-  animation: fadeInUp 0.42s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+.animate-fade-in-up {
+  animation: fadeInUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Spring scale transitions */
-.bg-slate-900,
-.bg-slate-900\/50,
-input,
-select,
-button,
-a {
-  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
-}
-
-.bg-slate-900:hover,
-.bg-slate-900\/50:hover {
-  transform: scale(1.005) translateY(-1px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.03), 0 3px 10px rgba(0, 0, 0, 0.02) !important;
-  border-color: rgba(59, 130, 246, 0.25) !important;
-}
-
-button:active {
-  transform: scale(0.97) !important;
+/* Input Focus Glow */
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
 }

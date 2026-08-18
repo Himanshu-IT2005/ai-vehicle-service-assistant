@@ -149,7 +149,7 @@ export default function AiAssistant() {
                                 rows="4"
                                 value={queryText}
                                 onChange={(e) => setQueryText(e.target.value)}
-                                className="block w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-sm placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors"
+                                className="block w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-base sm:text-sm placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors"
                                 placeholder="Example: My bike makes a strange grinding noise from the front wheel when I apply the front brake, and the handlebar vibrates..."
                                 required
                             />
@@ -168,7 +168,7 @@ export default function AiAssistant() {
                                         type="text"
                                         value={startedWhen}
                                         onChange={(e) => setStartedWhen(e.target.value)}
-                                        className="block w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-550"
+                                        className="block w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-base sm:text-sm focus:outline-none focus:ring-1 focus:ring-blue-550"
                                         placeholder="e.g., 2 days ago, yesterday morning"
                                     />
                                 </div>
@@ -178,7 +178,7 @@ export default function AiAssistant() {
                                         type="text"
                                         value={frequency}
                                         onChange={(e) => setFrequency(e.target.value)}
-                                        className="block w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-550"
+                                        className="block w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-base sm:text-sm focus:outline-none focus:ring-1 focus:ring-blue-550"
                                         placeholder="e.g., Every time I accelerate, intermittent"
                                     />
                                 </div>
@@ -188,7 +188,7 @@ export default function AiAssistant() {
                                         type="text"
                                         value={conditions}
                                         onChange={(e) => setConditions(e.target.value)}
-                                        className="block w-full px-3 py-2 bg-slate-950 border border-slate-805 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-550"
+                                        className="block w-full px-3 py-2 bg-slate-950 border border-slate-805 rounded-lg text-base sm:text-sm focus:outline-none focus:ring-1 focus:ring-blue-550"
                                         placeholder="e.g., Braking, starting, going over bumps"
                                     />
                                 </div>
@@ -198,7 +198,7 @@ export default function AiAssistant() {
                                         type="text"
                                         value={warningLight}
                                         onChange={(e) => setWarningLight(e.target.value)}
-                                        className="block w-full px-3 py-2 bg-slate-950 border border-slate-805 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-555"
+                                        className="block w-full px-3 py-2 bg-slate-950 border border-slate-805 rounded-lg text-base sm:text-sm focus:outline-none focus:ring-1 focus:ring-blue-555"
                                         placeholder="e.g., Engine check light, ABS indicator"
                                     />
                                 </div>

@@ -109,7 +109,7 @@ export default function AdminLayout({ children }) {
             {/* Main Panel */}
             <div className="flex-1 flex flex-col overflow-hidden">
                 {/* Header */}
-                <header className="h-16 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-6 z-10">
+                <header className="h-16 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-4 sm:px-6 z-10">
                     {/* Mobile Menu trigger */}
                     <button
                         onClick={() => setMobileMenuOpen(true)}
@@ -118,7 +118,7 @@ export default function AdminLayout({ children }) {
                         <Menu className="w-6 h-6" />
                     </button>
 
-                    <span className="text-xs text-rose-400 font-semibold tracking-widest uppercase bg-rose-950/30 px-3 py-1.5 rounded-full border border-rose-900/20">
+                    <span className="text-[10px] sm:text-xs text-rose-400 font-semibold tracking-widest uppercase bg-rose-950/30 px-3 py-1.5 rounded-full border border-rose-900/20">
                         SYSTEM ADMIN AREA
                     </span>
 
@@ -127,7 +127,7 @@ export default function AdminLayout({ children }) {
                 </header>
 
                 {/* Content Body */}
-                <main className="flex-1 overflow-y-auto bg-slate-950 p-6 md:p-8">
+                <main className="flex-1 overflow-y-auto bg-slate-950 p-4 sm:p-6 md:p-8">
                     <div className="max-w-7xl mx-auto">
                         {children}
                     </div>

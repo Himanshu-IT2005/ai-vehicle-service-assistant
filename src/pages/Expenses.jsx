@@ -359,7 +359,7 @@ export default function Expenses() {
                                     name="vehicleId"
                                     value={formData.vehicleId}
                                     onChange={handleFormChange}
-                                    className="block w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl focus:ring-1 focus:ring-blue-550 focus:outline-none"
+                                    className="block w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-base sm:text-sm focus:ring-1 focus:ring-blue-550 focus:outline-none"
                                     required
                                 >
                                     {vehicles.map(v => (
@@ -374,7 +374,7 @@ export default function Expenses() {
                                     name="categoryId"
                                     value={formData.categoryId}
                                     onChange={handleFormChange}
-                                    className="block w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl focus:ring-1 focus:ring-blue-550 focus:outline-none"
+                                    className="block w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-base sm:text-sm focus:ring-1 focus:ring-blue-550 focus:outline-none"
                                 >
                                     {categories.map(c => (
                                         <option key={c.id} value={c.id}>{c.name}</option>
@@ -390,7 +390,7 @@ export default function Expenses() {
                                     value={formData.amount}
                                     onChange={handleFormChange}
                                     placeholder="e.g. 1500"
-                                    className="block w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl focus:ring-1 focus:ring-blue-550 focus:outline-none"
+                                    className="block w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-base sm:text-sm focus:ring-1 focus:ring-blue-550 focus:outline-none"
                                     required
                                 />
                             </div>
@@ -402,7 +402,7 @@ export default function Expenses() {
                                     name="expenseDate"
                                     value={formData.expenseDate}
                                     onChange={handleFormChange}
-                                    className="block w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl focus:ring-1 focus:ring-blue-550 focus:outline-none"
+                                    className="block w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-base sm:text-sm focus:ring-1 focus:ring-blue-550 focus:outline-none"
                                     required
                                 />
                             </div>
@@ -415,7 +415,7 @@ export default function Expenses() {
                                     value={formData.description}
                                     onChange={handleFormChange}
                                     placeholder="e.g. Shell Petrol, Brake Oil change, Tyre wash"
-                                    className="block w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl focus:ring-1 focus:ring-blue-550 focus:outline-none"
+                                    className="block w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-base sm:text-sm focus:ring-1 focus:ring-blue-550 focus:outline-none"
                                     required
                                 />
                             </div>
