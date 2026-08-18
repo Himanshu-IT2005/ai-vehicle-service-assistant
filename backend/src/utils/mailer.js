@@ -128,7 +128,7 @@ const sendEmailViaBrevo = (mailOptions) => {
     return new Promise((resolve, reject) => {
         console.log(`[Brevo Mailer] Dispatching email via HTTPS API to ${mailOptions.to}...`);
 
-        const senderEmail = process.env.SMTP_USER || 'webm503@gmail.com';
+        const senderEmail = process.env.BREVO_SENDER_EMAIL || 'chauhanhimanshu0608@gmail.com';
         const senderName = 'DriveSync AI';
 
         const postData = JSON.stringify({
