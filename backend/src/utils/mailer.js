@@ -123,6 +123,63 @@ const sendEmailViaResend = (mailOptions) => {
     });
 };
 
+// Dispatch email via Brevo's HTTPS REST API (allows sending up to 300 free emails/day to ANY recipient worldwide without domain restrictions)
+const sendEmailViaBrevo = (mailOptions) => {
+    return new Promise((resolve, reject) => {
+        console.log(`[Brevo Mailer] Dispatching email via HTTPS API to ${mailOptions.to}...`);
+
+        const senderEmail = process.env.SMTP_USER || 'webm503@gmail.com';
+        const senderName = 'DriveSync AI';
+
+        const postData = JSON.stringify({
+            sender: { name: senderName, email: senderEmail },
+            to: [{ email: mailOptions.to }],
+            subject: mailOptions.subject,
+            htmlContent: mailOptions.html
+        });
+
+        const options = {
+            hostname: 'api.brevo.com',
+            port: 443,
+            path: '/v3/smtp/email',
+            method: 'POST',
+            headers: {
+                'api-key': process.env.BREVO_API_KEY,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Content-Length': Buffer.byteLength(postData)
+            }
+        };
+
+        const req = https.request(options, (res) => {
+            let data = '';
+            res.on('data', chunk => { data += chunk; });
+            res.on('end', () => {
+                if (res.statusCode >= 200 && res.statusCode < 300) {
+                    try {
+                        const parsed = JSON.parse(data);
+                        console.log(`[Brevo Mailer] Email sent successfully to ${mailOptions.to}! Message ID: ${parsed.messageId}`);
+                        resolve({ messageId: parsed.messageId });
+                    } catch (e) {
+                        resolve({ messageId: null });
+                    }
+                } else {
+                    console.error(`[Brevo Mailer Error] API status ${res.statusCode}: ${data}`);
+                    reject(new Error(`Brevo HTTPS dispatch failed: Status ${res.statusCode} - ${data}`));
+                }
+            });
+        });
+
+        req.on('error', (err) => {
+            console.error(`[Brevo Mailer Error] Request error: ${err.message}`);
+            reject(err);
+        });
+
+        req.write(postData);
+        req.end();
+    });
+};
+
 const sendViaSMTP = async (mailOptions) => {
     try {
         console.log(`[SMTP Mailer] Attempting connection via port ${primaryPort}...`);
@@ -146,6 +203,10 @@ const sendViaSMTP = async (mailOptions) => {
 
 const transporter = {
     sendMail: async (mailOptions) => {
+        if (process.env.BREVO_API_KEY) {
+            return await sendEmailViaBrevo(mailOptions);
+        }
+
         if (process.env.RESEND_API_KEY) {
             try {
                 return await sendEmailViaResend(mailOptions);
@@ -168,7 +229,7 @@ const transporter = {
             }
         }
 
-        console.warn(`[SMTP Mailer Notice] RESEND_API_KEY env variable is not set. Attempting direct SMTP connection...`);
+        console.warn(`[SMTP Mailer Notice] BREVO_API_KEY & RESEND_API_KEY are not set. Attempting direct SMTP connection...`);
         return await sendViaSMTP(mailOptions);
     }
 };
