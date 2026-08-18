@@ -71,7 +71,7 @@ export default function Register() {
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
                                     className="block w-full pl-10 pr-3 py-3 bg-slate-950/80 border border-slate-800 rounded-xl text-base sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
-                                    placeholder="John Doe"
+                                    placeholder="Enter your full name"
                                     required
                                 />
                             </div>
@@ -91,7 +91,7 @@ export default function Register() {
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     className="block w-full pl-10 pr-3 py-3 bg-slate-950/80 border border-slate-800 rounded-xl text-base sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
-                                    placeholder="name@example.com"
+                                    placeholder="Enter your email address"
                                     required
                                 />
                             </div>
@@ -111,7 +111,7 @@ export default function Register() {
                                     value={phone}
                                     onChange={(e) => setPhone(e.target.value)}
                                     className="block w-full pl-10 pr-3 py-3 bg-slate-950/80 border border-slate-800 rounded-xl text-base sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
-                                    placeholder="+1 555-0199"
+                                    placeholder="Enter your phone number"
                                 />
                             </div>
                         </div>
@@ -130,7 +130,7 @@ export default function Register() {
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     className="block w-full pl-10 pr-3 py-3 bg-slate-950/80 border border-slate-800 rounded-xl text-base sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
-                                    placeholder="••••••••"
+                                    placeholder="Enter your password"
                                     required
                                 />
                             </div>
