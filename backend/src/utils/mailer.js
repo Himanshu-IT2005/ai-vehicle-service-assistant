@@ -144,7 +144,7 @@ const sendEmailViaBrevo = (mailOptions) => {
             path: '/v3/smtp/email',
             method: 'POST',
             headers: {
-                'api-key': process.env.BREVO_API_KEY,
+                'api-key': getBrevoKey(),
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
                 'Content-Length': Buffer.byteLength(postData)
@@ -201,9 +201,12 @@ const sendViaSMTP = async (mailOptions) => {
     }
 };
 
+const getBrevoKey = () => process.env.BREVO_API_KEY || process.env.BREVO_KEY || process.env.SENDINBLUE_API_KEY;
+
 const transporter = {
     sendMail: async (mailOptions) => {
-        if (process.env.BREVO_API_KEY) {
+        const brevoKey = getBrevoKey();
+        if (brevoKey) {
             return await sendEmailViaBrevo(mailOptions);
         }
 
