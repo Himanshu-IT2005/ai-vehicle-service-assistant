@@ -150,6 +150,11 @@ const transporter = {
             try {
                 return await sendEmailViaResend(mailOptions);
             } catch (resendErr) {
+                // If Resend failed due to sandbox recipient restriction (403), skip direct SMTP fallback to prevent 10-second cloud port timeouts
+                if (resendErr.isSandboxRestriction) {
+                    throw resendErr;
+                }
+
                 const hasSMTP = process.env.SMTP_USER && process.env.SMTP_USER !== 'your_email@gmail.com' && process.env.SMTP_PASS;
                 if (hasSMTP) {
                     console.log(`[Resend Fallback] Resend dispatch failed (${resendErr.message}). Attempting fallback to configured SMTP server...`);
@@ -262,11 +267,10 @@ const sendWelcomeEmail = async (toEmail, userName) => {
         return true;
     } catch (error) {
         if (error.isSandboxRestriction) {
-            console.log(`[SMTP Mailer Notice] Welcome email skipped for ${toEmail} due to Resend Sandbox mode (only recipient ${process.env.SMTP_USER || 'owner'} allowed until custom domain is verified at resend.com). Registration completed successfully!`);
+            console.log(`[Resend Sandbox Notice] Welcome email skipped for ${toEmail} (unverified recipient in Resend Sandbox mode). Registration completed instantly!`);
             return true;
         }
         console.error('[SMTP Mailer Error] Failed to send registration email:', error.message);
-        // We do not throw error here, so the signup flow remains uninterrupted if SMTP server is down/offline.
         return false;
     }
 };
