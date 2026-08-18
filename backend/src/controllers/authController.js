@@ -184,21 +184,14 @@ const forgotPassword = async (req, res, next) => {
         // Update database with the new password hash
         await pool.query('UPDATE users SET password_hash = ? WHERE id = ?', [passwordHash, user.id]);
 
-        // Send email with the temporary password
-        try {
-            await sendResetPasswordEmail(user.email, user.name, tempPassword);
-        } catch (mailErr) {
+        // Send email with the temporary password asynchronously in background
+        sendResetPasswordEmail(user.email, user.name, tempPassword).catch(mailErr => {
             console.error('\n=======================================================');
             console.log('[DEVELOPER MAIL FALLBACK] Send mail failed. Temporary Password:');
             console.log(`To: ${user.email}`);
             console.log(`Temp Password: ${tempPassword}`);
             console.log('=======================================================\n');
-
-            return res.status(200).json({
-                success: true,
-                message: `Password reset succeeded. SMTP delivery failed (${mailErr.message}), but credentials have been logged to the developer terminal logs.`
-            });
-        }
+        });
 
         res.status(200).json({
             success: true,

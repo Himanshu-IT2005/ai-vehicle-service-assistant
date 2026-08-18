@@ -256,73 +256,90 @@ const sendWelcomeEmail = async (toEmail, userName) => {
         }
 
         const mailOptions = {
-            from: process.env.SMTP_FROM || `"AI Vehicle Service Assistant" <${process.env.SMTP_USER}>`,
+            from: process.env.SMTP_FROM || `"DriveSync AI" <${process.env.BREVO_SENDER_EMAIL || process.env.SMTP_USER || 'chauhanhimanshu0608@gmail.com'}>`,
             to: toEmail,
-            subject: 'Welcome to AI Vehicle Service Assistant! 🎉',
+            subject: 'Welcome to DriveSync AI! 🎉',
             html: `
-                <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 30px; border: 1px solid #1e293b; border-radius: 16px; background-color: #0b0f19; color: #f1f5f9;">
-                    <!-- Sleek Gradient Header -->
-                    <div style="background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%); padding: 30px; border-radius: 12px; text-align: center; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2);">
-                        <span style="font-size: 26px; font-weight: 800; color: #ffffff; letter-spacing: 2px; text-transform: uppercase;">
-                            AI Service Assistant
-                        </span>
-                        <h1 style="margin: 10px 0 0 0; font-size: 18px; font-weight: 600; color: #e2e8f0; opacity: 0.95;">
-                            Welcome to the Garage! 🚀
-                        </h1>
-                    </div>
-                    
-                    <!-- Welcome Details -->
-                    <div style="padding: 10px 15px; text-align: left;">
-                        <h2 style="color: #60a5fa; font-size: 20px; font-weight: 700; margin-top: 0; margin-bottom: 12px;">
-                            Salutations, ${userName}!
-                        </h2>
-                        <p style="font-size: 15px; line-height: 1.6; color: #cbd5e1; margin-bottom: 20px;">
-                            Your account is active. Start logging maintenance events, budgeting spends, and diagnosing vehicle symptoms today.
-                        </p>
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="utf-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <style>
+                        @media only screen and (max-width: 600px) {
+                            .email-container { width: 100% !important; padding: 15px !important; }
+                            .header-box { padding: 20px 15px !important; }
+                            .cta-button { width: 100% !important; box-sizing: border-box !important; }
+                        }
+                    </style>
+                </head>
+                <body style="margin: 0; padding: 0; background-color: #030712; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #030712; padding: 20px 10px;">
+                        <tr>
+                            <td align="center">
+                                <div class="email-container" style="max-width: 560px; width: 100%; margin: 0 auto; padding: 24px; border: 1px solid #1e293b; border-radius: 16px; background-color: #0b0f19; color: #f1f5f9; text-align: left; box-sizing: border-box;">
+                                    <!-- Sleek Gradient Header -->
+                                    <div class="header-box" style="background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%); padding: 24px 20px; border-radius: 12px; text-align: center; margin-bottom: 24px; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.25);">
+                                        <span style="font-size: 22px; font-weight: 800; color: #ffffff; letter-spacing: 2px; text-transform: uppercase; display: block;">
+                                            DriveSync AI
+                                        </span>
+                                        <h1 style="margin: 8px 0 0 0; font-size: 16px; font-weight: 600; color: #e2e8f0; opacity: 0.95;">
+                                            Welcome to the Garage! 🚀
+                                        </h1>
+                                    </div>
+                                    
+                                    <!-- Welcome Details -->
+                                    <h2 style="color: #60a5fa; font-size: 19px; font-weight: 700; margin: 0 0 12px 0;">
+                                        Salutations, ${userName}!
+                                    </h2>
+                                    <p style="font-size: 14px; line-height: 1.6; color: #cbd5e1; margin: 0 0 20px 0;">
+                                        Your account is ready. Log maintenance events, budget vehicle expenses, and diagnose trouble symptoms with AI instantly.
+                                    </p>
 
-                        <!-- Feature Blocks -->
-                        <h3 style="color: #a78bfa; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-top: 30px; margin-bottom: 15px;">
-                            App Key Features
-                        </h3>
-                        
-                        <div style="background-color: #1e293b; border: 1px solid #334155; padding: 15px; border-radius: 10px; margin-bottom: 12px;">
-                            <strong style="color: #60a5fa; font-size: 14px; display: block; margin-bottom: 4px;">🛠️ AI Problem Analysis</strong>
-                            <span style="font-size: 13px; color: #94a3b8; line-height: 1.5;">Describe vehicle issues to receive potential causes and severity advice.</span>
-                        </div>
+                                    <!-- Feature Cards -->
+                                    <h3 style="color: #a78bfa; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin: 24px 0 12px 0;">
+                                        App Highlights
+                                    </h3>
+                                    
+                                    <div style="background-color: #1e293b; border: 1px solid #334155; padding: 14px 16px; border-radius: 10px; margin-bottom: 10px;">
+                                        <strong style="color: #60a5fa; font-size: 14px; display: block; margin-bottom: 4px;">🛠️ AI Problem Analysis</strong>
+                                        <span style="font-size: 13px; color: #94a3b8; line-height: 1.4;">Describe vehicle issues to receive cause & severity advice.</span>
+                                    </div>
 
-                        <div style="background-color: #1e293b; border: 1px solid #334155; padding: 15px; border-radius: 10px; margin-bottom: 12px;">
-                            <strong style="color: #34d399; font-size: 14px; display: block; margin-bottom: 4px;">📊 Service & Expense Timeline</strong>
-                            <span style="font-size: 13px; color: #94a3b8; line-height: 1.5;">Log maintenance categories, invoices, Odometer states, and total budgets.</span>
-                        </div>
+                                    <div style="background-color: #1e293b; border: 1px solid #334155; padding: 14px 16px; border-radius: 10px; margin-bottom: 10px;">
+                                        <strong style="color: #34d399; font-size: 14px; display: block; margin-bottom: 4px;">📊 Service & Expense Timeline</strong>
+                                        <span style="font-size: 13px; color: #94a3b8; line-height: 1.4;">Track maintenance, receipts, odometer readings & total budgets.</span>
+                                    </div>
 
-                        <div style="background-color: #1e293b; border: 1px solid #334155; padding: 15px; border-radius: 10px; margin-bottom: 12px;">
-                            <strong style="color: #fbbf24; font-size: 14px; display: block; margin-bottom: 4px;">🔔 Maintenance Alarms</strong>
-                            <span style="font-size: 13px; color: #94a3b8; line-height: 1.5;">Configure upcoming interval dates and mileage alert targets.</span>
-                        </div>
+                                    <div style="background-color: #1e293b; border: 1px solid #334155; padding: 14px 16px; border-radius: 10px; margin-bottom: 10px;">
+                                        <strong style="color: #fbbf24; font-size: 14px; display: block; margin-bottom: 4px;">🔔 Maintenance Alarms</strong>
+                                        <span style="font-size: 13px; color: #94a3b8; line-height: 1.4;">Set upcoming interval dates and mileage alert targets.</span>
+                                    </div>
 
-                        <!-- CTA Button -->
-                        <div style="margin: 35px 0 25px 0; text-align: center;">
-                            <a href="${process.env.CLIENT_URL || 'http://localhost:5173'}" style="background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%); color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 15px; display: inline-block; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);">
-                                Launch Live Dashboard
-                            </a>
-                        </div>
+                                    <!-- CTA Button -->
+                                    <div style="margin: 28px 0 20px 0; text-align: center;">
+                                        <a href="${process.env.CLIENT_URL || 'https://ai-vehicle-service-assistant.vercel.app'}" class="cta-button" style="background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%); color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 15px; display: inline-block; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);">
+                                            Launch Live Dashboard
+                                        </a>
+                                    </div>
 
-                        <!-- safety note / disclaimer -->
-                        <div style="border-top: 1px solid #334155; padding-top: 20px; margin-top: 30px;">
-                            <span style="color: #ef4444; font-size: 9px; font-weight: 850; border: 1px solid #991b1b; background-color: #7f1d1d; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 8px; letter-spacing: 0.5px;">
-                                SAFETY ADVISORY
-                            </span>
-                            <p style="font-size: 11px; color: #64748b; line-height: 1.6; margin: 0;">
-                                AI diagnostic inputs and outputs are informational preliminary recommendations and are not a substitute for certified physical vehicle mechanic inspections.
-                            </p>
-                        </div>
-                    </div>
-                    
-                    <!-- footer -->
-                    <div style="margin-top: 25px; padding-top: 15px; border-top: 1px solid #1e293b; text-align: center; font-size: 11px; color: #475569;">
-                        © 2026 AI Vehicle Service Assistant. Secure Owner Console.
-                    </div>
-                </div>
+                                    <!-- Disclaimer -->
+                                    <div style="border-top: 1px solid #1e293b; padding-top: 16px; margin-top: 24px;">
+                                        <p style="font-size: 11px; color: #64748b; line-height: 1.5; margin: 0;">
+                                            <strong>Safety Note:</strong> AI diagnostic suggestions are preliminary informational guidance and do not replace professional mechanic inspections.
+                                        </p>
+                                    </div>
+                                    
+                                    <!-- Footer -->
+                                    <div style="margin-top: 20px; padding-top: 12px; border-top: 1px solid #1e293b; text-align: center; font-size: 11px; color: #475569;">
+                                        © 2026 DriveSync AI Platform. All rights reserved.
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </body>
+                </html>
             `
         };
 
@@ -344,57 +361,78 @@ const sendResetPasswordEmail = async (toEmail, userName, tempPassword) => {
         const isPlaceholder = (!process.env.SMTP_USER ||
             process.env.SMTP_USER === 'your_email@gmail.com' ||
             !process.env.SMTP_PASS ||
-            process.env.SMTP_PASS === 'your_app_password') && !process.env.RESEND_API_KEY;
+            process.env.SMTP_PASS === 'your_app_password') && !process.env.RESEND_API_KEY && !getBrevoKey();
 
         if (isPlaceholder) {
             console.log('\n=======================================================');
             console.log('[DEVELOPER MAIL LOG] SMTP is not configured. Logging Password Reset Email:');
             console.log(`To: ${toEmail}`);
-            console.log(`Subject: Password Reset Request - AI Vehicle Service Assistant`);
+            console.log(`Subject: Password Reset Request - DriveSync AI`);
             console.log(`Body: Hi ${userName}, your new temporary password is: ${tempPassword}. Please log in and change it in Profile settings.`);
             console.log('=======================================================\n');
             return true;
         }
 
         const mailOptions = {
-            from: process.env.SMTP_FROM || `"AI Vehicle Service Assistant" <${process.env.SMTP_USER}>`,
+            from: process.env.SMTP_FROM || `"DriveSync AI" <${process.env.BREVO_SENDER_EMAIL || process.env.SMTP_USER || 'chauhanhimanshu0608@gmail.com'}>`,
             to: toEmail,
-            subject: 'Password Reset Request - AI Vehicle Service Assistant 🔑',
+            subject: 'Password Reset Request - DriveSync AI 🔑',
             html: `
-                <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 30px; border: 1px solid #1e293b; border-radius: 16px; background-color: #0b0f19; color: #f1f5f9;">
-                    <div style="background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%); padding: 30px; border-radius: 12px; text-align: center; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2);">
-                        <span style="font-size: 26px; font-weight: 800; color: #ffffff; letter-spacing: 2px; text-transform: uppercase;">
-                            AI Service Assistant
-                        </span>
-                        <h1 style="margin: 10px 0 0 0; font-size: 18px; font-weight: 600; color: #e2e8f0; opacity: 0.95;">
-                            Password Reset Requested 🔑
-                        </h1>
-                    </div>
-                    <div style="padding: 10px 15px; text-align: left;">
-                        <h2 style="color: #60a5fa; font-size: 20px; font-weight: 700; margin-top: 0; margin-bottom: 12px;">
-                            Hello, ${userName}!
-                        </h2>
-                        <p style="font-size: 15px; line-height: 1.6; color: #cbd5e1; margin-bottom: 20px;">
-                            You requested security access assistance reset for your vehicle logs account. We have generated a unique temporary password for you:
-                        </p>
-                        <div style="background-color: #1e293b; border: 1px solid #334155; padding: 20px; border-radius: 10px; text-align: center; margin-bottom: 25px;">
-                            <span style="font-family: monospace; font-size: 24px; font-weight: bold; color: #fbbf24; letter-spacing: 1px;">
-                                ${tempPassword}
-                            </span>
-                        </div>
-                        <p style="font-size: 14px; line-height: 1.6; color: #94a3b8; margin-bottom: 30px;">
-                            Please log in using your email and this temporary password code. Update your credentials under <strong>Profile settings</strong> tab immediately after access.
-                        </p>
-                        <div style="margin: 25px 0; text-align: center;">
-                            <a href="${process.env.CLIENT_URL || 'http://localhost:5173'}/login" style="background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%); color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 15px; display: inline-block; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);">
-                                Log In Now
-                            </a>
-                        </div>
-                    </div>
-                    <div style="margin-top: 25px; padding-top: 15px; border-top: 1px solid #1e293b; text-align: center; font-size: 11px; color: #475569;">
-                        © 2026 AI Vehicle Service Assistant. Secure Account Recovery.
-                    </div>
-                </div>
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="utf-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <style>
+                        @media only screen and (max-width: 600px) {
+                            .email-container { width: 100% !important; padding: 15px !important; }
+                            .cta-button { width: 100% !important; box-sizing: border-box !important; }
+                        }
+                    </style>
+                </head>
+                <body style="margin: 0; padding: 0; background-color: #030712; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #030712; padding: 20px 10px;">
+                        <tr>
+                            <td align="center">
+                                <div class="email-container" style="max-width: 560px; width: 100%; margin: 0 auto; padding: 24px; border: 1px solid #1e293b; border-radius: 16px; background-color: #0b0f19; color: #f1f5f9; text-align: left; box-sizing: border-box;">
+                                    <div style="background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%); padding: 24px 20px; border-radius: 12px; text-align: center; margin-bottom: 24px; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.25);">
+                                        <span style="font-size: 22px; font-weight: 800; color: #ffffff; letter-spacing: 2px; text-transform: uppercase; display: block;">
+                                            DriveSync AI
+                                        </span>
+                                        <h1 style="margin: 8px 0 0 0; font-size: 16px; font-weight: 600; color: #e2e8f0; opacity: 0.95;">
+                                            Password Reset Requested 🔑
+                                        </h1>
+                                    </div>
+                                    <div style="padding: 0 5px;">
+                                        <h2 style="color: #60a5fa; font-size: 19px; font-weight: 700; margin: 0 0 12px 0;">
+                                            Hello, ${userName}!
+                                        </h2>
+                                        <p style="font-size: 14px; line-height: 1.6; color: #cbd5e1; margin: 0 0 20px 0;">
+                                            You requested security access assistance reset for your vehicle logs account. Here is your temporary password:
+                                        </p>
+                                        <div style="background-color: #1e293b; border: 1px solid #334155; padding: 18px; border-radius: 10px; text-align: center; margin-bottom: 22px;">
+                                            <span style="font-family: monospace; font-size: 24px; font-weight: bold; color: #fbbf24; letter-spacing: 2px;">
+                                                ${tempPassword}
+                                            </span>
+                                        </div>
+                                        <p style="font-size: 13px; line-height: 1.5; color: #94a3b8; margin: 0 0 24px 0;">
+                                            Please log in using this code and update your password in <strong>Profile Settings</strong> immediately.
+                                        </p>
+                                        <div style="margin: 24px 0; text-align: center;">
+                                            <a href="${process.env.CLIENT_URL || 'https://ai-vehicle-service-assistant.vercel.app'}/login" class="cta-button" style="background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%); color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 15px; display: inline-block; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);">
+                                                Log In Now
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div style="margin-top: 24px; padding-top: 12px; border-top: 1px solid #1e293b; text-align: center; font-size: 11px; color: #475569;">
+                                        © 2026 DriveSync AI Platform. Secure Account Recovery.
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </body>
+                </html>
             `
         };
 
@@ -432,31 +470,51 @@ const sendAccountDeletedEmail = async (toEmail, userName) => {
         }
 
         const mailOptions = {
-            from: process.env.SMTP_FROM || `"DriveSync AI" <${process.env.SMTP_USER}>`,
+            from: process.env.SMTP_FROM || `"DriveSync AI" <${process.env.BREVO_SENDER_EMAIL || process.env.SMTP_USER || 'chauhanhimanshu0608@gmail.com'}>`,
             to: toEmail,
             subject: 'Account Permanently Deleted - DriveSync AI 🚗',
             html: `
-                <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 30px; border: 1px solid #e2e8f0; border-radius: 16px; background-color: #ffffff; color: #1e293b;">
-                    <div style="background: linear-gradient(135deg, #ef4444 0%, #991b1b 100%); padding: 30px; border-radius: 12px; text-align: center; margin-bottom: 25px;">
-                        <span style="font-size: 26px; font-weight: 800; color: #ffffff; letter-spacing: 2px; text-transform: uppercase;">
-                            DriveSync AI
-                        </span>
-                        <h1 style="margin: 10px 0 0 0; font-size: 18px; font-weight: 600; color: #fecaca;">
-                            Account Permanently Deleted ⚠️
-                        </h1>
-                    </div>
-                    <div style="padding: 10px 15px; text-align: left;">
-                        <h2 style="color: #ef4444; font-size: 20px; font-weight: 700; margin-top: 0; margin-bottom: 12px;">
-                            Goodbye, ${userName}!
-                        </h2>
-                        <p style="font-size: 15px; line-height: 1.6; color: #475569; margin-bottom: 20px;">
-                            This email confirms that your DriveSync AI account associated with <strong>${toEmail}</strong> has been permanently deleted as requested.
-                        </p>
-                    </div>
-                    <div style="margin-top: 25px; padding-top: 15px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 11px; color: #94a3b8;">
-                        © 2026 DriveSync AI Platform. Data Privacy & Deletion Complete.
-                    </div>
-                </div>
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="utf-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <style>
+                        @media only screen and (max-width: 600px) {
+                            .email-container { width: 100% !important; padding: 15px !important; }
+                        }
+                    </style>
+                </head>
+                <body style="margin: 0; padding: 0; background-color: #030712; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #030712; padding: 20px 10px;">
+                        <tr>
+                            <td align="center">
+                                <div class="email-container" style="max-width: 560px; width: 100%; margin: 0 auto; padding: 24px; border: 1px solid #1e293b; border-radius: 16px; background-color: #0b0f19; color: #f1f5f9; text-align: left; box-sizing: border-box;">
+                                    <div style="background: linear-gradient(135deg, #ef4444 0%, #991b1b 100%); padding: 24px 20px; border-radius: 12px; text-align: center; margin-bottom: 24px; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.25);">
+                                        <span style="font-size: 22px; font-weight: 800; color: #ffffff; letter-spacing: 2px; text-transform: uppercase; display: block;">
+                                            DriveSync AI
+                                        </span>
+                                        <h1 style="margin: 8px 0 0 0; font-size: 16px; font-weight: 600; color: #fecaca; opacity: 0.95;">
+                                            Account Permanently Deleted ⚠️
+                                        </h1>
+                                    </div>
+                                    <div style="padding: 0 5px;">
+                                        <h2 style="color: #ef4444; font-size: 19px; font-weight: 700; margin: 0 0 12px 0;">
+                                            Goodbye, ${userName}!
+                                        </h2>
+                                        <p style="font-size: 14px; line-height: 1.6; color: #cbd5e1; margin: 0 0 20px 0;">
+                                            This email confirms that your DriveSync AI account associated with <strong>${toEmail}</strong> and all associated vehicle history logs have been permanently deleted as requested.
+                                        </p>
+                                    </div>
+                                    <div style="margin-top: 24px; padding-top: 12px; border-top: 1px solid #1e293b; text-align: center; font-size: 11px; color: #475569;">
+                                        © 2026 DriveSync AI Platform. Data Privacy & Account Deletion Complete.
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </body>
+                </html>
             `
         };
 
