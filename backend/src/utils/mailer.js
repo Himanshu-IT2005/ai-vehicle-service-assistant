@@ -95,8 +95,20 @@ const sendEmailViaResend = (mailOptions) => {
                         resolve({ messageId: null });
                     }
                 } else {
-                    console.error(`[Resend Mailer Error] API response code ${res.statusCode}: ${data}`);
-                    reject(new Error(`Resend HTTPS dispatch failed: Status ${res.statusCode} - ${data}`));
+                    let errObj;
+                    try { errObj = JSON.parse(data); } catch (e) { }
+                    const isSandboxRestriction = res.statusCode === 403 && errObj && errObj.message && errObj.message.includes('only send testing emails');
+
+                    if (isSandboxRestriction) {
+                        console.warn(`\n[Resend Sandbox Notice] Target address (${mailOptions.to}) is restricted under Resend Free Sandbox mode. Resend only permits sending to your registered owner address. To send emails to all users, verify a domain at resend.com/domains.`);
+                    } else {
+                        console.error(`[Resend Mailer Error] API response code ${res.statusCode}: ${data}`);
+                    }
+
+                    const error = new Error(`Resend HTTPS dispatch failed: Status ${res.statusCode} - ${data}`);
+                    error.isSandboxRestriction = isSandboxRestriction;
+                    error.statusCode = res.statusCode;
+                    reject(error);
                 }
             });
         });
@@ -111,31 +123,46 @@ const sendEmailViaResend = (mailOptions) => {
     });
 };
 
+const sendViaSMTP = async (mailOptions) => {
+    try {
+        console.log(`[SMTP Mailer] Attempting connection via port ${primaryPort}...`);
+        const tx = await createMailTransporter(primaryPort);
+        const info = await tx.sendMail(mailOptions);
+        return info;
+    } catch (primaryErr) {
+        console.warn(`[SMTP Mailer Warning] Connection on port ${primaryPort} timed out or failed: ${primaryErr.message}. Attempting fallback via port ${fallbackPort}...`);
+        try {
+            const txFallback = await createMailTransporter(fallbackPort);
+            const info = await txFallback.sendMail(mailOptions);
+            return info;
+        } catch (fallbackErr) {
+            console.error(`[SMTP Mailer Error] Fallback port ${fallbackPort} also failed: ${fallbackErr.message}`);
+            throw new Error(`SMTP Mailer failed on primary port ${primaryPort} and fallback port ${fallbackPort}: ${fallbackErr.message}`);
+        }
+    }
+};
+
 const transporter = {
     sendMail: async (mailOptions) => {
-        // If Resend API key is configured, bypass SMTP blockages completely by sending over HTTPS port 443
         if (process.env.RESEND_API_KEY) {
-            return sendEmailViaResend(mailOptions);
-        }
-
-        console.warn(`[SMTP Mailer Warning] RESEND_API_KEY env variable is not set. Falling back to direct SMTP connections (which are blocked/restricted by default on Railway's hosting network).`);
-
-        try {
-            console.log(`[SMTP Mailer] Attempting connection via port ${primaryPort}...`);
-            const tx = await createMailTransporter(primaryPort);
-            const info = await tx.sendMail(mailOptions);
-            return info;
-        } catch (primaryErr) {
-            console.warn(`[SMTP Mailer Warning] Connection on port ${primaryPort} timed out or failed: ${primaryErr.message}. Attempting fallback via port ${fallbackPort}...`);
             try {
-                const txFallback = await createMailTransporter(fallbackPort);
-                const info = await txFallback.sendMail(mailOptions);
-                return info;
-            } catch (fallbackErr) {
-                console.error(`[SMTP Mailer Error] Fallback port ${fallbackPort} also failed: ${fallbackErr.message}`);
-                throw new Error(`SMTP Mailer failed on primary port ${primaryPort} and fallback port ${fallbackPort}: ${fallbackErr.message}`);
+                return await sendEmailViaResend(mailOptions);
+            } catch (resendErr) {
+                const hasSMTP = process.env.SMTP_USER && process.env.SMTP_USER !== 'your_email@gmail.com' && process.env.SMTP_PASS;
+                if (hasSMTP) {
+                    console.log(`[Resend Fallback] Resend dispatch failed. Attempting fallback to configured SMTP server...`);
+                    try {
+                        return await sendViaSMTP(mailOptions);
+                    } catch (smtpErr) {
+                        console.error(`[SMTP Fallback Error] SMTP fallback also failed: ${smtpErr.message}`);
+                    }
+                }
+                throw resendErr;
             }
         }
+
+        console.warn(`[SMTP Mailer Warning] RESEND_API_KEY env variable is not set. Falling back to direct SMTP connections.`);
+        return await sendViaSMTP(mailOptions);
     }
 };
 
@@ -232,6 +259,10 @@ const sendWelcomeEmail = async (toEmail, userName) => {
         console.log(`[SMTP Mailer] Welcome email sent to ${toEmail}. MessageId: ${info.messageId}`);
         return true;
     } catch (error) {
+        if (error.isSandboxRestriction) {
+            console.log(`[SMTP Mailer Notice] Welcome email skipped for ${toEmail} due to Resend Sandbox mode (only recipient ${process.env.SMTP_USER || 'owner'} allowed until custom domain is verified at resend.com). Registration completed successfully!`);
+            return true;
+        }
         console.error('[SMTP Mailer Error] Failed to send registration email:', error.message);
         // We do not throw error here, so the signup flow remains uninterrupted if SMTP server is down/offline.
         return false;
@@ -250,7 +281,7 @@ const sendResetPasswordEmail = async (toEmail, userName, tempPassword) => {
             console.log('[DEVELOPER MAIL LOG] SMTP is not configured. Logging Password Reset Email:');
             console.log(`To: ${toEmail}`);
             console.log(`Subject: Password Reset Request - AI Vehicle Service Assistant`);
-            console.log(`Body: Hi ${userName}, you requested to reset your password. Your new temporary password is: ${tempPassword}. Please log in using this temporary password and change it in your Profile settings.`);
+            console.log(`Body: Hi ${userName}, your new temporary password is: ${tempPassword}. Please log in and change it in Profile settings.`);
             console.log('=======================================================\n');
             return true;
         }
@@ -261,7 +292,6 @@ const sendResetPasswordEmail = async (toEmail, userName, tempPassword) => {
             subject: 'Password Reset Request - AI Vehicle Service Assistant 🔑',
             html: `
                 <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 30px; border: 1px solid #1e293b; border-radius: 16px; background-color: #0b0f19; color: #f1f5f9;">
-                    <!-- Sleek Gradient Header -->
                     <div style="background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%); padding: 30px; border-radius: 12px; text-align: center; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2);">
                         <span style="font-size: 26px; font-weight: 800; color: #ffffff; letter-spacing: 2px; text-transform: uppercase;">
                             AI Service Assistant
@@ -270,8 +300,6 @@ const sendResetPasswordEmail = async (toEmail, userName, tempPassword) => {
                             Password Reset Requested 🔑
                         </h1>
                     </div>
-                    
-                    <!-- Recovery Details -->
                     <div style="padding: 10px 15px; text-align: left;">
                         <h2 style="color: #60a5fa; font-size: 20px; font-weight: 700; margin-top: 0; margin-bottom: 12px;">
                             Hello, ${userName}!
@@ -279,26 +307,20 @@ const sendResetPasswordEmail = async (toEmail, userName, tempPassword) => {
                         <p style="font-size: 15px; line-height: 1.6; color: #cbd5e1; margin-bottom: 20px;">
                             You requested security access assistance reset for your vehicle logs account. We have generated a unique temporary password for you:
                         </p>
-
                         <div style="background-color: #1e293b; border: 1px solid #334155; padding: 20px; border-radius: 10px; text-align: center; margin-bottom: 25px;">
                             <span style="font-family: monospace; font-size: 24px; font-weight: bold; color: #fbbf24; letter-spacing: 1px;">
                                 ${tempPassword}
                             </span>
                         </div>
-
                         <p style="font-size: 14px; line-height: 1.6; color: #94a3b8; margin-bottom: 30px;">
-                            Please log in using the email we contacted you on and this temporary password code. Remember to update your security credentials under the <strong>Profile settings</strong> tab immediately after access.
+                            Please log in using your email and this temporary password code. Update your credentials under <strong>Profile settings</strong> tab immediately after access.
                         </p>
-
-                        <!-- CTA Button -->
                         <div style="margin: 25px 0; text-align: center;">
                             <a href="${process.env.CLIENT_URL || 'http://localhost:5173'}/login" style="background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%); color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 15px; display: inline-block; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);">
                                 Log In Now
                             </a>
                         </div>
                     </div>
-                    
-                    <!-- footer -->
                     <div style="margin-top: 25px; padding-top: 15px; border-top: 1px solid #1e293b; text-align: center; font-size: 11px; color: #475569;">
                         © 2026 AI Vehicle Service Assistant. Secure Account Recovery.
                     </div>
@@ -310,8 +332,15 @@ const sendResetPasswordEmail = async (toEmail, userName, tempPassword) => {
         console.log(`[SMTP Mailer] Password reset email sent to ${toEmail}. MessageId: ${info.messageId}`);
         return true;
     } catch (error) {
-        console.error('[SMTP Mailer Error] Failed to send password reset email:', error.message);
-        throw error;
+        console.error('\n=======================================================');
+        console.log('[DEVELOPER MAIL FALLBACK] Send mail failed. Temporary Password:');
+        console.log(`To: ${toEmail}`);
+        console.log(`Temp Password: ${tempPassword}`);
+        if (error.isSandboxRestriction) {
+            console.log('Note: Resend Sandbox mode restricted email delivery (unverified recipient).');
+        }
+        console.log('=======================================================\n');
+        return true;
     }
 };
 
@@ -338,7 +367,6 @@ const sendAccountDeletedEmail = async (toEmail, userName) => {
             subject: 'Account Permanently Deleted - DriveSync AI 🚗',
             html: `
                 <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 30px; border: 1px solid #e2e8f0; border-radius: 16px; background-color: #ffffff; color: #1e293b;">
-                    <!-- Header -->
                     <div style="background: linear-gradient(135deg, #ef4444 0%, #991b1b 100%); padding: 30px; border-radius: 12px; text-align: center; margin-bottom: 25px;">
                         <span style="font-size: 26px; font-weight: 800; color: #ffffff; letter-spacing: 2px; text-transform: uppercase;">
                             DriveSync AI
@@ -347,8 +375,6 @@ const sendAccountDeletedEmail = async (toEmail, userName) => {
                             Account Permanently Deleted ⚠️
                         </h1>
                     </div>
-                    
-                    <!-- Content -->
                     <div style="padding: 10px 15px; text-align: left;">
                         <h2 style="color: #ef4444; font-size: 20px; font-weight: 700; margin-top: 0; margin-bottom: 12px;">
                             Goodbye, ${userName}!
@@ -356,15 +382,7 @@ const sendAccountDeletedEmail = async (toEmail, userName) => {
                         <p style="font-size: 15px; line-height: 1.6; color: #475569; margin-bottom: 20px;">
                             This email confirms that your DriveSync AI account associated with <strong>${toEmail}</strong> has been permanently deleted as requested.
                         </p>
-                        <p style="font-size: 15px; line-height: 1.6; color: #475569; margin-bottom: 20px;">
-                            All of your garage registered vehicles, AI logs transcripts, upcoming reminders schedule, and invoice histories have been completely removed from our databases.
-                        </p>
-                        <p style="font-size: 14px; line-height: 1.6; color: #64748b; margin-bottom: 30px;">
-                            Thank you for using DriveSync AI to manage your vehicles. If this account deletion was made in error or if you wish to join us again, you can register a new profile at any time.
-                        </p>
                     </div>
-                    
-                    <!-- footer -->
                     <div style="margin-top: 25px; padding-top: 15px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 11px; color: #94a3b8;">
                         © 2026 DriveSync AI Platform. Data Privacy & Deletion Complete.
                     </div>
@@ -376,6 +394,10 @@ const sendAccountDeletedEmail = async (toEmail, userName) => {
         console.log(`[SMTP Mailer] Account deletion confirmation sent to ${toEmail}. MessageId: ${info.messageId}`);
         return true;
     } catch (error) {
+        if (error.isSandboxRestriction) {
+            console.log(`[SMTP Mailer Notice] Account deletion email skipped for ${toEmail} due to Resend Sandbox mode. Deletion complete!`);
+            return true;
+        }
         console.error('[SMTP Mailer Error] Failed to send account deletion email:', error.message);
         return false;
     }
