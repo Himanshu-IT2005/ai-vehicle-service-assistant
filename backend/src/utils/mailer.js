@@ -136,8 +136,10 @@ const sendViaSMTP = async (mailOptions) => {
             const info = await txFallback.sendMail(mailOptions);
             return info;
         } catch (fallbackErr) {
-            console.error(`[SMTP Mailer Error] Fallback port ${fallbackPort} also failed: ${fallbackErr.message}`);
-            throw new Error(`SMTP Mailer failed on primary port ${primaryPort} and fallback port ${fallbackPort}: ${fallbackErr.message}`);
+            console.warn(`[SMTP Mailer Notice] Direct SMTP ports (${primaryPort}/${fallbackPort}) are blocked or timed out on this hosting network: ${fallbackErr.message}`);
+            const error = new Error(`SMTP ports blocked or timed out: ${fallbackErr.message}`);
+            error.isConnectionTimeout = true;
+            throw error;
         }
     }
 };
@@ -150,18 +152,18 @@ const transporter = {
             } catch (resendErr) {
                 const hasSMTP = process.env.SMTP_USER && process.env.SMTP_USER !== 'your_email@gmail.com' && process.env.SMTP_PASS;
                 if (hasSMTP) {
-                    console.log(`[Resend Fallback] Resend dispatch failed. Attempting fallback to configured SMTP server...`);
+                    console.log(`[Resend Fallback] Resend dispatch failed (${resendErr.message}). Attempting fallback to configured SMTP server...`);
                     try {
                         return await sendViaSMTP(mailOptions);
                     } catch (smtpErr) {
-                        console.error(`[SMTP Fallback Error] SMTP fallback also failed: ${smtpErr.message}`);
+                        console.warn(`[SMTP Fallback Notice] SMTP fallback also failed: ${smtpErr.message}`);
                     }
                 }
                 throw resendErr;
             }
         }
 
-        console.warn(`[SMTP Mailer Warning] RESEND_API_KEY env variable is not set. Falling back to direct SMTP connections.`);
+        console.warn(`[SMTP Mailer Notice] RESEND_API_KEY env variable is not set. Attempting direct SMTP connection...`);
         return await sendViaSMTP(mailOptions);
     }
 };
